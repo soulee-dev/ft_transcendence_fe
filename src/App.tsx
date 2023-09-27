@@ -1,29 +1,12 @@
 import React, { useState } from 'react';
-import { socketService } from './SocketService';
-import PongGame from './PongGame';
+import Pong from './Pong';
 
 function App() {
-  const [player, setPlayer] = useState(null); // initial state is null, meaning no player has been selected
-
-  socketService.connect();
-
-  const handlePlayerSelection = (selectedPlayer: any) => {
-    setPlayer(selectedPlayer);
-  }
-
-  if (!player) {
-    return (
-      <div className="App">
-        <h2>Select Your Player:</h2>
-        <button onClick={() => handlePlayerSelection('A')}>Player A</button>
-        <button onClick={() => handlePlayerSelection('B')}>Player B</button>
-      </div>
-    );
-  }
-
+  
   return (
     <div className="App">
-      <PongGame player={player} />
+      <Pong width="400" height="300"
+      style={{border: 1 + "px solid green"}} />
     </div>
   );
 }
