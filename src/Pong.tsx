@@ -1,32 +1,44 @@
-import React, { useEffect, useRef} from 'react';
+import { useEffect, useRef } from "react";
+import Ball from "./Ball";
 
-function Pong(props: any) {
-	const ref = useRef<HTMLCanvasElement>(null);
-	let isPlaying = true;
-	let lastPressedKey = useRef("");
-	//const [ball, setBall] = useState({ x: 200, y: 150, radius: 8, dx: 2, dy: 2 });
-	const ballRef = useRef({
-		x: 200,
-		y: 150,
-		radius: 8,
-		dx: 0.1,
-		dy: 0.1,
-		color: "green",
+const CANVAS_WIDTH: number = 504;
+const CANVAS_HEIGHT: number = 724;
+
+function clamp(value: number, min: number, max: number) {
+	return Math.min(Math.max(value, min), max);
+}
+
+function Pong() {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	let isPlaying: boolean = true;
+	let lastPressedKey: string = "";
+
+	const ball = new Ball(
+		CANVAS_WIDTH / 2,
+		CANVAS_HEIGHT / 2,
+		8,
+		0.2,
+		0.2,
+		"green"
+	);
+	const myPaddleRef = useRef({
+		x: CANVAS_WIDTH / 2,
+		y: CANVAS_HEIGHT - 10,
+		width: 200,
+		height: 10,
+		dx: 0,
 	});
-	// const [myPaddleRef.current, setMyPaddleRef.current] = useState({ x: 0, y: 100, width: 10, height: 100 });
-	const myPaddleRef = useRef({ x: 0, y: 100, width: 10, height: 100, dy: 0 });
 	const opponentPaddle = useRef({
-		x: 390,
-		y: 100,
-		width: 10,
-		height: 100,
-		dy: 0,
+		x: CANVAS_WIDTH / 2,
+		y: 0,
+		width: 200,
+		height: 10,
+		dx: 0,
 	});
 
-	// const [score, setScore] = useState({ player1: 0, player2: 0 });
 	const scoreRef = useRef({ player1: 0, player2: 0 });
-	const FPS = useRef(0);
-	const lastTime = useRef(0);
+	let FPS: number = 0;
+	let lastTime: number = 0;
 
 	function draw(context: CanvasRenderingContext2D) {
 		if (isPlaying) {
@@ -36,17 +48,11 @@ function Pong(props: any) {
 				context.canvas.width,
 				context.canvas.height
 			);
-			context.fillStyle = ballRef.current.color;
+			context.fillStyle = ball.color;
 			context.beginPath();
-			context.arc(
-				ballRef.current.x,
-				ballRef.current.y,
-				ballRef.current.radius,
-				0,
-				Math.PI * 2
-			);
+			context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
 			context.fill();
-			ballRef.current.color = "green";
+			ball.color = "green";
 
 			context.fillRect(
 				myPaddleRef.current.x,
@@ -69,127 +75,127 @@ function Pong(props: any) {
 					" : " +
 					scoreRef.current.player2 +
 					" |player 2",
-				100,
-				20
+				200,
+				400
 			);
 			context.font = "10px Arial";
-			context.fillText("FPS: " + FPS.current, 340, 20);
+			context.fillText("FPS: " + FPS, 280, 420);
 		}
 	}
 
 	function update(deltaTime: number) {
-		//update ball position
-		// let updatedBall = { ...ballRef.current};
-		const CollisionwithPaddle = (ball: any) => {
+		const CollisionwithPaddle = (ball: Ball) => {
 			if (
-				ball.x - ball.radius <
-					myPaddleRef.current.x + myPaddleRef.current.width &&
-				ball.y > myPaddleRef.current.y &&
-				ball.y < myPaddleRef.current.y + myPaddleRef.current.height
+				ball.y + ball.radius > myPaddleRef.current.y &&
+				ball.x > myPaddleRef.current.x &&
+				ball.x < myPaddleRef.current.x + myPaddleRef.current.width
 			) {
-				ball.dx = -ball.dx;
+				ball.dx *= 1.1;
+				ball.dy = -ball.dy * 1.1;
 			}
 			if (
-				ball.x + ball.radius > opponentPaddle.current.x &&
-				ball.y > opponentPaddle.current.y &&
-				ball.y <
-					opponentPaddle.current.y + opponentPaddle.current.height
+				ball.y - ball.radius <
+					opponentPaddle.current.y + opponentPaddle.current.height &&
+				ball.x > opponentPaddle.current.width &&
+				ball.x < opponentPaddle.current.x + opponentPaddle.current.width
 			) {
-				ball.dx = -ball.dx;
+				ball.dx *= 1.1;
+				ball.dy = -ball.dy * 1.1;
 			}
 		};
-		CollisionwithPaddle(ballRef.current);
+		CollisionwithPaddle(ball);
 
-		const CollisionwithWall = (ball:any, canvas:any) => {
-			if (ball.x + ball.radius > canvas.width) {
+		const CollisionwithWall = (ball: Ball, canvas: any) => {
+			if (ball.y + ball.radius > canvas.height) {
 				ball.color = "red";
 				scoreRef.current.player1 += 1;
 				// ballRef.current.x = 200;
 				// ballRef.current.y = 150;
-				ball.dx = -ball.dx;
-			} else if (ball.x - ball.radius < 0) {
+				ball.dy = -ball.dy;
+			} else if (ball.y - ball.radius < 0) {
 				ball.color = "red";
 				scoreRef.current.player2 += 1;
 				// ballRef.current.x = 200;
 				// ballRef.current.y = 150;
-				ball.dx = -ball.dx;
+				ball.dy = -ball.dy;
 			}
 			if (
-				ball.y + ball.radius > canvas.height ||
-				ball.y - ball.radius < 0
+				ball.x + ball.radius > canvas.width ||
+				ball.x - ball.radius < 0
 			) {
-				console.log(ball.y - ball.radius);
-				ball.dy = -ball.dy;
+				ball.dx = -ball.dx;
 			}
 			if (
 				scoreRef.current.player1 >= 5 ||
 				scoreRef.current.player2 >= 5
 			) {
 				isPlaying = false;
-				// window.cancelAnimationFrame(animationID);
 			}
 		};
-		CollisionwithWall(ballRef.current, ref.current);
-		if (deltaTime > 100) {
-			console.log("dt : " + deltaTime);
-		}
-		ballRef.current.x += ballRef.current.dx * deltaTime;
-		ballRef.current.y += ballRef.current.dy * deltaTime;
-		myPaddleRef.current.y += myPaddleRef.current.dy;
-		opponentPaddle.current.y += opponentPaddle.current.dy;
+		CollisionwithWall(ball, canvasRef.current);
+		ball.x += ball.dx * deltaTime;
+		ball.y += ball.dy * deltaTime;
+		myPaddleRef.current.x = clamp(
+			myPaddleRef.current.x + myPaddleRef.current.dx * deltaTime,
+			0,
+			400
+		);
+		opponentPaddle.current.x = clamp(
+			opponentPaddle.current.x + opponentPaddle.current.dx * deltaTime,
+			0,
+			400
+		);
 	}
 
 	useEffect(() => {
-		const canvas = ref.current!;
+		const canvas = canvasRef.current!;
 		const context = canvas.getContext("2d");
 
 		let animationID: number;
 
 		function renderer(time: number) {
 			let worldTime = Math.floor(time);
-			let deltaTime = worldTime - lastTime.current;
-			lastTime.current = worldTime;
+			let deltaTime = worldTime - lastTime;
+			lastTime = worldTime;
 			if (deltaTime > 0) {
-				FPS.current = Math.floor(1000 / deltaTime);
+				FPS = Math.floor(1000 / deltaTime);
 			}
-			draw(context!);
 			update(deltaTime);
+			draw(context!);
 
 			window.requestAnimationFrame(renderer);
 		}
 		animationID = window.requestAnimationFrame(renderer);
 
 		function handleKeydown(e: KeyboardEvent) {
-			lastPressedKey.current = e.key;
+			lastPressedKey = e.key;
 			switch (e.key) {
-				case "ArrowUp":
-					console.log("Pressed key : up");
-					// myPaddleRef.current.y -= 10;
-					myPaddleRef.current.dy = -1;
+				case "ArrowLeft":
+					console.log("Pressed key : left");
+					myPaddleRef.current.dx = -0.25;
 					break;
-				case "ArrowDown":
-					console.log("Pressed key : down");
-					// myPaddleRef.current.y += 10;
-					myPaddleRef.current.dy = 1;
+				case "ArrowRight":
+					console.log("Pressed key : right");
+					myPaddleRef.current.dx = 0.25;
 					break;
 				case "q":
 					console.log("Pressed key : Q");
-					opponentPaddle.current.dy = -1;
+					opponentPaddle.current.dx = -0.25;
 					break;
-				case "a":
-					console.log("Pressed key : A");
-					opponentPaddle.current.dy = 1;
+				case "w":
+					console.log("Pressed key : w");
+					opponentPaddle.current.dx = 0.25;
 					break;
 				default:
 					break;
 			}
 		}
 
-		function handleKeyup(e : KeyboardEvent) {
+		function handleKeyup(e: KeyboardEvent) {
 			console.log("Released key : " + e.key);
-			if (lastPressedKey.current === e.key) {
-				myPaddleRef.current.dy = 0;
-				opponentPaddle.current.dy = 0;
+			if (lastPressedKey === e.key) {
+				myPaddleRef.current.dx = 0;
+				opponentPaddle.current.dx = 0;
 			}
 		}
 
@@ -200,6 +206,13 @@ function Pong(props: any) {
 		return () => window.cancelAnimationFrame(animationID);
 	}, []);
 
-	return (<canvas ref={ref} {...props} />);
+	return (
+		<canvas
+			ref={canvasRef}
+			width={CANVAS_WIDTH}
+			height={CANVAS_HEIGHT}
+			style={{ border: 1 + "px solid black" }}
+		/>
+	);
 }
 export default Pong;
