@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import Engine from "../game/Engine";
 
-const CANVAS_WIDTH: number = 504;
-const CANVAS_HEIGHT: number = 724;
+const CANVAS_WIDTH: number = 400;
+const CANVAS_HEIGHT: number = 727;
 
 function Game() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -16,6 +16,7 @@ function Game() {
 
 	return (
 		<canvas
+			className="center"
 			ref={canvasRef}
 			width={CANVAS_WIDTH}
 			height={CANVAS_HEIGHT}

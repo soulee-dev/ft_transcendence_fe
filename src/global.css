@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=AaCassiopeia:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=NeoDunggeunmo:wght@400&display=swap");
+body {
+  margin: 0;
+  line-height: normal;
+}
+:root {
+  /* fonts */
+  --font-aacassiopeia: AaCassiopeia;
+  --font-noto-sans-kr: "Noto Sans KR";
+  --font-neodunggeunmo: NeoDunggeunmo;
+
+  /* font sizes */
+  --font-size-base: 16px;
+  --font-size-xl: 20px;
+
+  /* Colors */
+  --color-gray-100: #808080;
+  --color-gray-200: #1e1e1e;
+  --color-gray-300: #010101;
+  --color-white: #fff;
+  --color-darkslategray-100: #2f2f2f;
+  --color-black: #000;
+  --color-firebrick: #af0e20;
+
+  /* Gaps */
+  --gap-3xs: 10px;
+
+  /* Paddings */
+  --padding-9xs: 4px;
+  --padding-11xs: 2px;
+
+  /* Border radiuses */
+  --br-13xl: 32px;
+}

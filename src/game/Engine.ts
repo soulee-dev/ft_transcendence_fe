@@ -156,6 +156,7 @@ class Engine {
 	};
 
 	handleKeyDown = (event: KeyboardEvent) => {
+		// event.preventDefault();
 		this._lastPressedKey = event.key;
 		switch (event.key) {
 			case "ArrowLeft":
