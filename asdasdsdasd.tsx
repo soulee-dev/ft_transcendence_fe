@@ -37,6 +37,6 @@ import Link from "next/link";
 
 // _app.js는 모든 페이지에 공통으로 적용되는 부분을 처리
 
-//layout pattern
+//layout   pattern
 
 // [id].js : 동적 라우팅
