@@ -7,9 +7,9 @@ export default function Profile() {
   const [name, setName] = useState("");
   const [data, setData] = useState({});
 
-  useEffect(() => {
+  const fetchUser = () => {
     const access_token = Cookies.get("access_token");
-    fetch("http://localhost:3000/users/131824", {
+    fetch("http://localhost:3000/users/me", {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -17,7 +17,9 @@ export default function Profile() {
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((error) => console.error(error));
-  }, []);
+  };
+
+  useEffect(() => fetchUser(), []);
 
   const handleUpdate = (event) => {
     event.preventDefault();
@@ -32,7 +34,10 @@ export default function Profile() {
       body: JSON.stringify(userData),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data))
+      .then((data) => {
+        fetchUser();
+        console.log(data);
+      })
       .catch((error) => console.error(error));
   };
 
