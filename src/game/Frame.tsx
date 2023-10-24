@@ -2,10 +2,10 @@
 
 import { FunctionComponent, useCallback, useEffect } from "react";
 import "../../style/Frame.css";
-import Game from "../../components/client/Game";
+import Game from "../components/client/Game";
 import dynamic from "next/dynamic";
 
-const DynamicGame = dynamic(() => import("../../components/client/Game"), {
+const DynamicGame = dynamic(() => import("../components/client/Game"), {
 	ssr: false,
 });
 

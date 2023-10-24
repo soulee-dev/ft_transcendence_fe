@@ -1,9 +1,10 @@
 import Ball from "./Ball";
 import Paddle from "./Paddle";
-import { clamp } from "../../utils/clamp";
+import { clamp } from "../utils/clamp";
 
 class Engine {
 	private _canvas: HTMLCanvasElement | null = null;
+	private _background: HTMLCanvasElement | null = null;
 	private _context: CanvasRenderingContext2D | null = null;
 	private _animationID: number;
 	private _bisPlaying: boolean;
@@ -24,16 +25,17 @@ class Engine {
 		console.log("Engine constructor");
 	}
 
-	init(canvas: HTMLCanvasElement) {
+	init(canvas: HTMLCanvasElement, background: HTMLCanvasElement) {
 		console.log("Engine init");
 		this._canvas = canvas;
+		this._background = background;
 		this._context = canvas.getContext("2d");
 		this._ball = new Ball(
 			this._canvas.width / 2,
 			this._canvas.height / 2,
 			8,
-			0.2,
-			0.2,
+			0,
+			0,
 			"green"
 		);
 		this._myPaddle = new Paddle(
@@ -50,67 +52,56 @@ class Engine {
 			10,
 			0
 		);
+		this._ball?.SetDirection(0, 0.1);
 		window.addEventListener("keydown", this.handleKeyDown);
 		window.addEventListener("keyup", this.handleKeyUp);
-		this.start();
 	}
 
 	start = () => {
 		console.log("Engine start");
 		this._bisPlaying = true;
+		this._lastTime = Math.floor(performance.now());
 		this._animationID = window.requestAnimationFrame(this.renderer);
 	};
 
 	stop = () => {
 		console.log("Engine stop");
 		this._bisPlaying = false;
+		window.cancelAnimationFrame(this._animationID);
 	};
 
 	renderer = (time: number) => {
-		// console.log("count: " + this.count++);
-		// console.log("Engine renderer: " + time + " Engine: " + this._canvas);
 		let worldTime = Math.floor(time);
 		let deltaTime = worldTime - this._lastTime;
 		this._lastTime = worldTime;
-		// if (deltaTime > 0) {
-		// 	FPS = Math.floor(1000 / deltaTime);
-		// }
-		// if (this._bisPlaying) {
 		this.update(deltaTime);
 		this.draw(this._context!);
-		window.requestAnimationFrame(this.renderer);
-		// } else {
-		// console.log("Pause");
-		// }
+		if (this._bisPlaying) {
+			window.requestAnimationFrame(this.renderer);
+		}
 	};
 
 	update = (deltaTime: number) => {
-		this._ball!.collisionDetection(
-			this._myPaddle!,
-			this._opponentPaddle!,
-			this._canvas!.width,
-			this._canvas!.height
-		);
-		// console.log(
-		// 	"move: " +
-		// 		this._ball!.dx * deltaTime +
-		// 		", " +
-		// 		this._ball!.dy * deltaTime +
-		// 		", " +
-		// 		deltaTime
-		// );
-		this._ball!.x += this._ball!.dx * deltaTime;
-		this._ball!.y += this._ball!.dy * deltaTime;
-		this._myPaddle!.x = clamp(
-			this._myPaddle!.x + this._myPaddle!.dx * deltaTime,
-			0,
-			400
-		);
-		this._opponentPaddle!.x = clamp(
-			this._opponentPaddle!.x + this._opponentPaddle!.dx * deltaTime,
-			0,
-			400
-		);
+		if (deltaTime > 0) {
+			this._ball!.collisionDetection(
+				this._myPaddle!,
+				this._opponentPaddle!,
+				this._canvas!.width,
+				this._canvas!.height
+			);
+			this._ball!.x += this._ball!.dx * deltaTime;
+			this._ball!.y += this._ball!.dy * deltaTime;
+			this._myPaddle!.x = clamp(
+				this._myPaddle!.x + this._myPaddle!.dx * deltaTime,
+				0,
+				400
+			);
+			this._opponentPaddle!.x = clamp(
+				this._opponentPaddle!.x + this._opponentPaddle!.dx * deltaTime,
+				0,
+				400
+			);
+		}
 	};
 
 	draw = (context: CanvasRenderingContext2D) => {

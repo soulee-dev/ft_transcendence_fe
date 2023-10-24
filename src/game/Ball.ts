@@ -44,7 +44,7 @@ class Ball {
 			this.x < myPaddle.x + myPaddle.width
 		) {
 			this.dx *= 1.1;
-			this.dy = -this.dy * 1.1;
+			this.dy = -this.dy;
 		}
 		if (
 			this.y - this.radius < opponentPaddle.y + opponentPaddle.height &&
@@ -52,7 +52,7 @@ class Ball {
 			this.x < opponentPaddle.x + opponentPaddle.width
 		) {
 			this.dx *= 1.1;
-			this.dy = -this.dy * 1.1;
+			this.dy = -this.dy;
 		}
 	};
 
@@ -89,6 +89,11 @@ class Ball {
 		// if (scoreRef.current.player1 >= 5 || scoreRef.current.player2 >= 5) {
 		// 	isPlaying = false;
 		// }
+	};
+
+	SetDirection = (dx: number, dy: number) => {
+		this.dx = dx;
+		this.dy = dy;
 	};
 }
 

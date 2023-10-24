@@ -1,55 +1,41 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
-import Engine from "../../app/game/Engine";
+import Engine from "../../game/Engine";
+import GameMode from "../../game/GameMode";
 
 const CANVAS_WIDTH: number = 502;
 const CANVAS_HEIGHT: number = 727;
 
 function Game() {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const backgroundRef = useRef<HTMLCanvasElement | null>(null);
 	const engineRef = useRef<Engine>(new Engine());
-	const [start, setStart] = useState<boolean>(false);
-
-	console.log("canvaRef.current outside effect", canvasRef.current);
+	const gameModeRef = useRef<GameMode>(new GameMode(engineRef.current));
 
 	useEffect(() => {
-		console.log("canvaRef.current inside effect", canvasRef.current);
-		if (start && canvasRef.current) {
+		console.log("Game component mounted.");
+		if (canvasRef.current) {
 			const canvas = canvasRef.current!;
-			engineRef.current.init(canvas);
+			engineRef.current.init(canvas, backgroundRef.current!);
+			gameModeRef.current.startMatch();
 		}
-	}, [start, canvasRef]);
+	}, [canvasRef]);
 
-	useEffect(() => {
-		window.addEventListener("keydown", (e: KeyboardEvent) => {
-			console.log("keydown", e.key);
-			if (e.key === " ") {
-				setStart(true);
-			}
-		});
-	}, []);
-
-	if (start) {
-		return (
+	return (
+		<div className="Canvas">
 			<canvas
-				// className="center"
+				ref={backgroundRef}
+				width={CANVAS_WIDTH}
+				height={CANVAS_HEIGHT}
+				style={{ backgroundColor: "gray" }}
+				z-inlist={1}
+			/>
+			<canvas
 				ref={canvasRef}
 				width={CANVAS_WIDTH}
 				height={CANVAS_HEIGHT}
+				z-index={2}
 			/>
-		);
-	} else {
-		return <div>Press space to start game.</div>;
-	}
-
-	return (
-		<canvas
-			className="center"
-			ref={canvasRef}
-			width={CANVAS_WIDTH}
-			height={CANVAS_HEIGHT}
-		/>
+		</div>
 	);
 }
 export default Game;

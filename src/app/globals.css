@@ -334,7 +334,7 @@ body {
   cursor: pointer;
 }
 .topNav {
-  background-color: tomato;
+  background-color: black;
   border: 1px solid white;
   display: flex;
   align-items: center;
@@ -369,8 +369,8 @@ body {
   border: 1px solid white;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; */
+  /* align-items: center; */
   /* width: 502px; */
   /* TODO: 원래 픽셀 503 */
   /* height: 727px; */
@@ -554,4 +554,13 @@ body {
   font-size: var(--font-size-xl);
   color: var(--color-white);
   font-family: var(--font-noto-sans-kr);
+}
+
+.Canvas {
+  position: relative;
+
+}
+
+canvas {
+  position: absolute;
 }
