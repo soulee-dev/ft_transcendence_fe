@@ -1,5 +1,6 @@
 "use client";
 
+import { ToastContainer, toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
@@ -42,12 +43,14 @@ export default function Profile() {
     })
       .then((res) => res.json())
       .then((data) => {
+        toast.success("프로필을 업데이트했습니다.");
         fetchUser();
       })
       .catch((error) => console.error(error));
   };
   return (
     <div>
+      <ToastContainer />
       <img src={userData.profile_image} width={100} height={100}></img>
       <form onSubmit={handleUpdate}>
         <label htmlFor="name">이름</label>
