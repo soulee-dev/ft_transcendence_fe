@@ -88,6 +88,23 @@ export default function Friends() {
       });
   };
 
+  const handleCreateDM = (friendId) => {
+    const access_token = Cookies.get("access_token");
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/channels/create/${friendId}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${access_token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        toast.success("DM을 만들었습니다.");
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(error);
+      });
+  };
+
   useEffect(() => {
     const access_token = Cookies.get("access_token");
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
@@ -102,7 +119,6 @@ export default function Friends() {
               headers: { Authorization: `Bearer ${access_token}` },
             }
           ).then((res) => res.json());
-          // setFriends(data)
         });
         return Promise.all(fetchUserInfos);
       })
@@ -155,6 +171,9 @@ export default function Friends() {
               <span>{friend.name}</span>
               <button onClick={() => handleFriendDelete(friend.name)}>
                 삭제
+              </button>
+              <button onClick={() => handleCreateDM(friend.id)}>
+                채팅 만들기
               </button>
             </li>
           ))}
