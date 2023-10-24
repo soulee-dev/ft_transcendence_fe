@@ -15,11 +15,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   const cookieStore = cookies();
   const access_token = cookieStore.get("access_token");
+  const two_factor_token = cookieStore.get("");
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {access_token ? (
+        {/* {access_token ? (
           <>
             <TopNavigator />
             <div className="main">
@@ -29,8 +30,17 @@ export default function RootLayout({ children }) {
             </div>
           </>
         ) : (
-          <a href="http://localhost:3000/auth">로그인 하기</a>
-        )}
+          <a href={`${process.env.NEXT_PUBLIC_API_URL}/auth`}>로그인 하기</a>
+        )} */}
+        <>
+          <TopNavigator />
+          <div className="main">
+            <LeftSide />
+            <a href={`${process.env.NEXT_PUBLIC_API_URL}/auth`}>로그인 하기</a>
+            <div className="center">{children}</div>
+            <RightSide />
+          </div>
+        </>
       </body>
     </html>
   );

@@ -11,7 +11,7 @@ export default function Profile() {
 
   const fetchUser = () => {
     const access_token = Cookies.get("access_token");
-    fetch("http://localhost:3000/users/me", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -32,7 +32,7 @@ export default function Profile() {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
     const updateData = { name, email, is_2fa: is2fa };
-    fetch("http://localhost:3000/users/me/update", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
