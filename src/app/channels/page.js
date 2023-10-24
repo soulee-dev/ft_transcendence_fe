@@ -70,7 +70,7 @@ export default function Channels() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: message,
+        message: messageText,
       }),
     })
       .then((res) => res.json())
