@@ -7,7 +7,7 @@ export default function Channels() {
   const [data, setData] = useState({});
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
+  const [messageText, setMessageText] = useState("");
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
@@ -30,7 +30,27 @@ export default function Channels() {
       },
     })
       .then((res) => res.json())
-      .then((data) => setMessages(data))
+      .then((data) => {
+        const fetchUserInfos = data.map((data) => {
+          return fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/${data.sent_by_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then((userInfo) => {
+              return {
+                chat: data,
+                sender: userInfo,
+              };
+            });
+        });
+        return Promise.all(fetchUserInfos);
+      })
+      .then((userInfos) => setMessages(userInfos))
       .catch((error) => console.error(error));
   }, [selectedChannel]);
 
@@ -38,11 +58,6 @@ export default function Channels() {
     event.preventDefault();
     const channelId = event.target.value;
     setSelectedChannel(channelId);
-  };
-
-  const handleMessageChange = (event) => {
-    event.preventDefault();
-    setMessage(event.target.value);
   };
 
   const handleSubmit = (event) => {
@@ -60,12 +75,12 @@ export default function Channels() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setMessage("");
-        setMessages([...messages, data]);
+        setMessageText("");
       })
       .catch((error) => console.error(error));
   };
 
+  console.log(messages);
   return (
     <div>
       <h1>채널 목록</h1>
@@ -86,11 +101,17 @@ export default function Channels() {
         {messages &&
           messages.length > 0 &&
           messages.map((message) => (
-            <li key={message.id}>{message.message}</li>
+            <li key={message.chat.id}>
+              {message.sender.name}: {message.chat.message}
+            </li>
           ))}
       </ul>
       <form>
-        <input type="text" value={message} onChange={handleMessageChange} />
+        <input
+          type="text"
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+        />
         <button onClick={handleSubmit}>전송</button>
       </form>
     </div>

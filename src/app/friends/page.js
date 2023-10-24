@@ -9,7 +9,6 @@ export default function Friends() {
   const [friends, setFriends] = useState({});
   const [friendRequests, setFriendRequests] = useState([]);
   const [name, setName] = useState("");
-  const notify = () => toast.success("Wow so easy!");
 
   const handleFriendRequest = (event) => {
     event.preventDefault();
@@ -122,9 +121,7 @@ export default function Friends() {
         });
         return Promise.all(fetchUserInfos);
       })
-      .then((usersData) => {
-        setFriends(usersData);
-      })
+      .then((usersData) => setFriends(usersData))
       .catch((error) => console.error(error));
   }, []);
 
