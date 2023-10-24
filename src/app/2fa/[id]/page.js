@@ -12,7 +12,7 @@ export default function TwoFA({ params }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch("http://localhost:3000/auth/validate-otp", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/validate-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
