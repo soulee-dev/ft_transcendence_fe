@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 
 export default function Friends() {
-  const [friends, setFriends] = useState({});
+  const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [name, setName] = useState("");
 
