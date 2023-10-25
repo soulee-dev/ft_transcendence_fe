@@ -3,6 +3,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function Profile() {
   const [name, setName] = useState("");
@@ -12,19 +13,23 @@ export default function Profile() {
 
   const fetchUser = () => {
     const access_token = Cookies.get("access_token");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
         setName(data.name);
         setEmail(data.email);
         setIs2fa(data.is_2fa);
         setUserData(data);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   useEffect(() => fetchUser(), []);
@@ -33,20 +38,20 @@ export default function Profile() {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
     const updateData = { name, email, is_2fa: is2fa };
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-      body: JSON.stringify(updateData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        toast.success("프로필을 업데이트했습니다.");
-        fetchUser();
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/users/me/update`, updateData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
       })
-      .catch((error) => console.error(error));
+      .then((response) => {
+        toast.success("프로필을 업데이트했습니다.");
+        fetchUser(); // Assuming fetchUser is a function you have that fetches user data.
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   return (
     <div>

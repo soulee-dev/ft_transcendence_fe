@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function Friends() {
   const [friends, setFriends] = useState({});
@@ -15,145 +16,185 @@ export default function Friends() {
 
     const access_token = Cookies.get("access_token");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends/add?name=${name}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/friends/add?name=${name}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
         toast.success("친구 요청을 보냈습니다.");
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
       });
   };
 
   const handleFriendRequestAccept = (requestId) => {
     const access_token = Cookies.get("access_token");
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/friends/request/${requestId}/accept`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/friends/request/${requestId}/accept`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
         toast.success("친구 요청을 승락했습니다.");
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
       });
   };
 
   const handleFriendRequestReject = (requestId) => {
     const access_token = Cookies.get("access_token");
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/friends/request/${requestId}/decline`,
-      { method: "POST", headers: { Authorization: `Bearer ${access_token}` } }
-    )
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/friends/request/${requestId}/decline`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
         toast.success("친구 요청을 거절했습니다.");
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
       });
   };
 
   const handleFriendDelete = (name) => {
     const access_token = Cookies.get("access_token");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends/delete/?name=${name}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${access_token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/friends/delete/?name=${name}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
         toast.success("친구를 삭제했습니다.");
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
       });
   };
 
   const handleCreateDM = (friendId) => {
     const access_token = Cookies.get("access_token");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/channels/create/${friendId}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${access_token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/create/${friendId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
         toast.success("DM을 만들었습니다.");
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
       });
   };
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
-      headers: { Authorization: `Bearer ${access_token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const fetchUserInfos = data.map((data) => {
-          return fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/${data.friend_id}`,
-            {
-              headers: { Authorization: `Bearer ${access_token}` },
-            }
-          ).then((res) => res.json());
-        });
-        return Promise.all(fetchUserInfos);
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       })
-      .then((usersData) => setFriends(usersData))
-      .catch((error) => console.error(error));
+      .then((response) => {
+        const data = response.data;
+
+        const fetchUserInfosPromises = data.map((friendData) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/${friendData.friend_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => userInfoResponse.data);
+        });
+
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((usersData) => {
+        setFriends(usersData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/friends/requests`, {
-      headers: { Authorization: `Bearer ${access_token}` },
-    })
-      .then((res) => res.json())
-      .then((requests) => {
-        const fetchUserInfos = requests.map((request) => {
-          return fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/${request.sender_id}`,
-            {
-              headers: { Authorization: `Bearer ${access_token}` },
-            }
-          )
-            .then((res) => res.json())
-            .then((userData) => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends/requests`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        const requests = response.data;
+
+        const fetchUserInfosPromises = requests.map((request) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/${request.sender_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => {
               return {
                 id: request.id,
-                userData,
+                userData: userInfoResponse.data,
               };
             });
         });
-        return Promise.all(fetchUserInfos);
+
+        return Promise.all(fetchUserInfosPromises);
       })
       .then((usersDataWithIds) => {
         setFriendRequests(usersDataWithIds);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   return (

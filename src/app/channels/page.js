@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function Channels() {
   const [data, setData] = useState({});
@@ -11,47 +12,57 @@ export default function Channels() {
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/channels/joined`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error(error));
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/joined`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
     if (selectedChannel === 0) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/${selectedChannel}`, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const fetchUserInfos = data.map((data) => {
-          return fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/${data.sent_by_id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${access_token}`,
-              },
-            }
-          )
-            .then((res) => res.json())
-            .then((userInfo) => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/chat/${selectedChannel}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        const fetchUserInfosPromises = data.map((chatData) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/${chatData.sent_by_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => {
               return {
-                chat: data,
-                sender: userInfo,
+                chat: chatData,
+                sender: userInfoResponse.data,
               };
             });
         });
-        return Promise.all(fetchUserInfos);
+
+        return Promise.all(fetchUserInfosPromises);
       })
-      .then((userInfos) => setMessages(userInfos))
-      .catch((error) => console.error(error));
+      .then((userInfos) => {
+        setMessages(userInfos);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [selectedChannel]);
 
   const handleSelectChannel = (event) => {
@@ -63,21 +74,25 @@ export default function Channels() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/${selectedChannel}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: messageText,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/chat/${selectedChannel}`,
+        {
+          message: messageText,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
         setMessageText("");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   console.log(messages);

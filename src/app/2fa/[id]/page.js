@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 
 export default function TwoFA({ params }) {
   const [code, setCode] = useState("");
@@ -12,22 +13,23 @@ export default function TwoFA({ params }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/validate-otp`, {
-      method: "POST",
+
+    axios({
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/auth/validate-otp`,
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include",
-      body: JSON.stringify({
+      withCredentials: true,
+      data: {
         userId: params.id,
         otp: code,
-      }),
+      },
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        if (data.redirectURI) {
-          window.location = data.redirectURI;
+      .then((response) => {
+        console.log(response.data);
+        if (response.data.redirectURI) {
+          window.location = response.data.redirectURI;
         }
       })
       .catch((error) => console.error(error));
