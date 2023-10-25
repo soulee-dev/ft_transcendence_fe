@@ -1,8 +1,7 @@
 import Paddle from "./Paddle";
+import Movable from "./Movable";
 
-class Ball {
-	x: number;
-	y: number;
+class Ball extends Movable {
 	radius: number;
 	dx: number;
 	dy: number;
@@ -16,8 +15,7 @@ class Ball {
 		dy: number,
 		color: string
 	) {
-		this.x = x;
-		this.y = y;
+		super(x, y);
 		this.radius = radius;
 		this.dx = dx;
 		this.dy = dy;
@@ -39,17 +37,17 @@ class Ball {
 		opponentPaddle: Paddle
 	) => {
 		if (
-			this.y + this.radius > myPaddle.y &&
-			this.x > myPaddle.x &&
-			this.x < myPaddle.x + myPaddle.width
+			this._y + this.radius > myPaddle._y &&
+			this._x > myPaddle._x &&
+			this._x < myPaddle._x + myPaddle.width
 		) {
 			this.dx *= 1.1;
 			this.dy = -this.dy;
 		}
 		if (
-			this.y - this.radius < opponentPaddle.y + opponentPaddle.height &&
-			this.x > opponentPaddle.width &&
-			this.x < opponentPaddle.x + opponentPaddle.width
+			this._y - this.radius < opponentPaddle._y + opponentPaddle.height &&
+			this._x > opponentPaddle.width &&
+			this._x < opponentPaddle._x + opponentPaddle.width
 		) {
 			this.dx *= 1.1;
 			this.dy = -this.dy;
@@ -57,34 +55,15 @@ class Ball {
 	};
 
 	private collisionDetectionWithWall = (width: number, height: number) => {
-		// console.log(
-		// 	this.x +
-		// 		this.radius +
-		// 		", " +
-		// 		this.y +
-		// 		this.radius +
-		// 		"canvas: " +
-		// 		width +
-		// 		", " +
-		// 		height
-		// );
-		if (this.y + this.radius > height) {
+		if (this._y + this.radius > height) {
 			this.color = "red";
-			// console.log("hit y");
-			// scoreRef.current.player1 += 1;
-			// ballRef.current.x = 200;
-			// ballRef.current.y = 150;
 			this.dy = -this.dy;
-		} else if (this.y - this.radius < 0) {
+		} else if (this._y - this.radius < 0) {
 			this.color = "red";
-			// scoreRef.current.player2 += 1;
-			// ballRef.current.x = 200;
-			// ballRef.current.y = 150;
 			this.dy = -this.dy;
 		}
-		if (this.x + this.radius > width || this.x - this.radius < 0) {
+		if (this._x + this.radius > width || this._x - this.radius < 0) {
 			this.dx = -this.dx;
-			// console.log("hit x ");
 		}
 		// if (scoreRef.current.player1 >= 5 || scoreRef.current.player2 >= 5) {
 		// 	isPlaying = false;

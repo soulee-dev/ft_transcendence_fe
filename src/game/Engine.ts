@@ -1,5 +1,5 @@
-import Ball from "./Ball";
-import Paddle from "./Paddle";
+import Ball from "./objects/Ball";
+import Paddle from "./objects/Paddle";
 import { clamp } from "../utils/clamp";
 
 class Engine {
@@ -89,15 +89,15 @@ class Engine {
 				this._canvas!.width,
 				this._canvas!.height
 			);
-			this._ball!.x += this._ball!.dx * deltaTime;
-			this._ball!.y += this._ball!.dy * deltaTime;
-			this._myPaddle!.x = clamp(
-				this._myPaddle!.x + this._myPaddle!.dx * deltaTime,
+			this._ball!._x += this._ball!.dx * deltaTime;
+			this._ball!._y += this._ball!.dy * deltaTime;
+			this._myPaddle!._x = clamp(
+				this._myPaddle!._x + this._myPaddle!.dx * deltaTime,
 				0,
 				400
 			);
-			this._opponentPaddle!.x = clamp(
-				this._opponentPaddle!.x + this._opponentPaddle!.dx * deltaTime,
+			this._opponentPaddle!._x = clamp(
+				this._opponentPaddle!._x + this._opponentPaddle!.dx * deltaTime,
 				0,
 				400
 			);
@@ -109,8 +109,8 @@ class Engine {
 		context.fillStyle = this._ball!.color;
 		context.beginPath();
 		context.arc(
-			this._ball!.x,
-			this._ball!.y,
+			this._ball!._x,
+			this._ball!._y,
 			this._ball!.radius,
 			0,
 			Math.PI * 2
@@ -119,14 +119,14 @@ class Engine {
 		this._ball!.color = "green";
 
 		context.fillRect(
-			this._myPaddle!.x,
-			this._myPaddle!.y,
+			this._myPaddle!._x,
+			this._myPaddle!._y,
 			this._myPaddle!.width,
 			this._myPaddle!.height
 		);
 		context.fillRect(
-			this._opponentPaddle!.x,
-			this._opponentPaddle!.y,
+			this._opponentPaddle!._x,
+			this._opponentPaddle!._y,
 			this._opponentPaddle!.width,
 			this._opponentPaddle!.height
 		);

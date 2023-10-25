@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Game from "../../components/client/Game";
-import Engine from "../../game/Engine";
 
 const CANVAS_WIDTH: number = 502;
 const CANVAS_HEIGHT: number = 727;
