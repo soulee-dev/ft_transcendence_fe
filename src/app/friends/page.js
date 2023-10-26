@@ -2,14 +2,17 @@
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { SocketContext } from "../../contexts/SocketContext";
 
 export default function Friends() {
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [name, setName] = useState("");
+  const socket = useContext(SocketContext);
+  const [notifications, setNotifications] = useState([]);
 
   const handleFriendRequest = (event) => {
     event.preventDefault();
@@ -197,6 +200,21 @@ export default function Friends() {
       });
   }, []);
 
+  // useEffect(() => {
+  //   if (socket) {
+  //     socket.on("notification", (message) => {
+  //       setNotifications((prev) => [...prev, message]);
+  //     });
+  //   }
+
+  //   return () => {
+  //     if (socket) {
+  //       socket.off("notification");
+  //     }
+  //   };
+  // }, [socket]);
+
+  console.log(notifications);
   return (
     <div>
       <ToastContainer />
