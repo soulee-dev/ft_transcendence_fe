@@ -12,13 +12,17 @@ import { SocketContext } from "../contexts/SocketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({ children }) {
-  const [access_token, setAccessToken] = useState(null);
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [access_token, setAccessToken] = useState<string | null>(null);
   const socket = useContext(SocketContext);
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
-    setAccessToken(access_token);
+    setAccessToken(access_token || null);
   }, []);
 
   return (
