@@ -21,10 +21,6 @@ export default function RootLayout({ children }) {
     setAccessToken(access_token);
   }, []);
 
-  if (access_token) {
-    socket.emit("join", { access_token });
-  }
-
   return (
     <html lang="en">
       <body className={inter.className}>
