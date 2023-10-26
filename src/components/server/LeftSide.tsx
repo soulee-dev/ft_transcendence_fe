@@ -11,6 +11,9 @@ function LeftSide() {
 					<Link href="/channels">채팅방</Link>
 				</li>
 				<li>
+					<Link href="/create_channel">채팅방 만들기</Link>
+				</li>
+				<li>
 					<Link href="/game">게임</Link>
 				</li>
 				<li>

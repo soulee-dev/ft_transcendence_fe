@@ -9,6 +9,7 @@ export default function Channels() {
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
