@@ -2,19 +2,132 @@
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, FC } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
 
 export default function Friends() {
-  const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([]);
-  const [name, setName] = useState("");
+  const [friends, setFriends] = useState<User[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [name, setName] = useState<string>("");
   const socket = useContext(SocketContext);
-  const [notifications, setNotifications] = useState([]);
 
-  const handleFriendRequest = (event) => {
+  type User = {
+    id: number;
+    name: string;
+  };
+
+  type FriendRequest = {
+    id: number;
+    sender_id: number;
+    userData: User;
+  };
+
+  const fetchFriends = () => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+
+        const fetchUserInfosPromises = data.map((friendData: any) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/${friendData.friend_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => userInfoResponse.data);
+        });
+
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((usersData) => {
+        setFriends(usersData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const fetchFriendRequests = () => {
+    const access_token = Cookies.get("access_token");
+
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends/requests`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        const requests = response.data;
+
+        const fetchUserInfosPromises = requests.map(
+          (request: FriendRequest) => {
+            return axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/users/${request.sender_id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${access_token}`,
+                  },
+                }
+              )
+              .then((userInfoResponse) => {
+                return {
+                  id: request.id,
+                  userData: userInfoResponse.data,
+                };
+              });
+          }
+        );
+
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((usersDataWithIds) => {
+        setFriendRequests(usersDataWithIds);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    if (socket) {
+      console.log("socket on");
+      socket.on("notification", (message: any) => {
+        console.log(message);
+        if (
+          message.type == "REQUESTED_FRIEND" ||
+          message.type == "DELETED_FRIEND" ||
+          message.type == "ACCEPTED_YOUR_REQ" ||
+          message.type == "DECLINED_YOUR_REQ" ||
+          message.type == "ADDED_TO_CHANNEL"
+        ) {
+          toast.success(message.message);
+          fetchFriends();
+          fetchFriendRequests();
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        console.log("socket off");
+        socket.off("notification");
+      }
+    };
+  }, [socket]);
+
+  const handleFriendRequest = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const access_token = Cookies.get("access_token");
@@ -38,7 +151,7 @@ export default function Friends() {
       });
   };
 
-  const handleFriendRequestAccept = (requestId) => {
+  const handleFriendRequestAccept = (requestId: number) => {
     const access_token = Cookies.get("access_token");
 
     axios
@@ -53,6 +166,8 @@ export default function Friends() {
       )
       .then((response) => {
         toast.success("친구 요청을 승락했습니다.");
+        fetchFriendRequests();
+        fetchFriends();
       })
       .catch((error) => {
         console.error(error);
@@ -60,7 +175,7 @@ export default function Friends() {
       });
   };
 
-  const handleFriendRequestReject = (requestId) => {
+  const handleFriendRequestReject = (requestId: number) => {
     const access_token = Cookies.get("access_token");
 
     axios
@@ -75,6 +190,7 @@ export default function Friends() {
       )
       .then((response) => {
         toast.success("친구 요청을 거절했습니다.");
+        fetchFriendRequests();
       })
       .catch((error) => {
         console.error(error);
@@ -82,7 +198,7 @@ export default function Friends() {
       });
   };
 
-  const handleFriendDelete = (name) => {
+  const handleFriendDelete = (name: string) => {
     const access_token = Cookies.get("access_token");
 
     axios
@@ -97,6 +213,7 @@ export default function Friends() {
       )
       .then((response) => {
         toast.success("친구를 삭제했습니다.");
+        fetchFriends();
       })
       .catch((error) => {
         console.error(error);
@@ -104,7 +221,7 @@ export default function Friends() {
       });
   };
 
-  const handleCreateDM = (friendId) => {
+  const handleCreateDM = (friendId: number) => {
     const access_token = Cookies.get("access_token");
 
     axios
@@ -127,94 +244,10 @@ export default function Friends() {
   };
 
   useEffect(() => {
-    const access_token = Cookies.get("access_token");
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-      .then((response) => {
-        const data = response.data;
-
-        const fetchUserInfosPromises = data.map((friendData) => {
-          return axios
-            .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/${friendData.friend_id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${access_token}`,
-                },
-              }
-            )
-            .then((userInfoResponse) => userInfoResponse.data);
-        });
-
-        return Promise.all(fetchUserInfosPromises);
-      })
-      .then((usersData) => {
-        setFriends(usersData);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    fetchFriends();
+    fetchFriendRequests();
   }, []);
 
-  useEffect(() => {
-    const access_token = Cookies.get("access_token");
-
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/friends/requests`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-      .then((response) => {
-        const requests = response.data;
-
-        const fetchUserInfosPromises = requests.map((request) => {
-          return axios
-            .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/${request.sender_id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${access_token}`,
-                },
-              }
-            )
-            .then((userInfoResponse) => {
-              return {
-                id: request.id,
-                userData: userInfoResponse.data,
-              };
-            });
-        });
-
-        return Promise.all(fetchUserInfosPromises);
-      })
-      .then((usersDataWithIds) => {
-        setFriendRequests(usersDataWithIds);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
-  // useEffect(() => {
-  //   if (socket) {
-  //     socket.on("notification", (message) => {
-  //       setNotifications((prev) => [...prev, message]);
-  //     });
-  //   }
-
-  //   return () => {
-  //     if (socket) {
-  //       socket.off("notification");
-  //     }
-  //   };
-  // }, [socket]);
-
-  console.log(notifications);
   return (
     <div>
       <ToastContainer />

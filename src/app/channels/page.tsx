@@ -2,24 +2,42 @@
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-export default function Channels() {
-  const [channels, setChannels] = useState({});
-  const [selectedChannel, setSelectedChannel] = useState(0);
-  const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState("");
-  const [publicChannels, setPublicChannels] = useState([]);
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userList, setUserList] = useState([]);
-  const selectOption = ["PUBLIC", "PRIVATE"];
-  const [selected, setSelected] = useState(selectOption[0]);
+type ChatData = {
+  sent_by_id: number;
+  id: number;
+  message: string;
+};
 
-  const handleSelect = (e) => {
+type UserData = {
+  name: string;
+  id: number;
+};
+
+type ChannelData = {
+  id: number;
+  name: string;
+};
+
+export default function () {
+  const [channels, setChannels] = useState<ChannelData[]>([]);
+  const [selectedChannel, setSelectedChannel] = useState<number>(0);
+  const [messages, setMessages] = useState<
+    { chat: ChatData; sender: UserData }[]
+  >([]);
+  const [messageText, setMessageText] = useState<string>("");
+  const [publicChannels, setPublicChannels] = useState<ChannelData[]>([]);
+  const [name, setName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
+  const [userList, setUserList] = useState<string[]>([]);
+  const selectOption: string[] = ["PUBLIC", "PRIVATE"];
+  const [selected, setSelected] = useState<string>(selectOption[0]);
+
+  const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
   };
 
@@ -88,7 +106,7 @@ export default function Channels() {
       })
       .then((response) => {
         const data = response.data;
-        const fetchUserInfosPromises = data.map((chatData) => {
+        const fetchUserInfosPromises = data.map((chatData: ChatData) => {
           return axios
             .get(
               `${process.env.NEXT_PUBLIC_API_URL}/users/${chatData.sent_by_id}`,
@@ -119,13 +137,13 @@ export default function Channels() {
       });
   }, [selectedChannel]);
 
-  const handleSelectChannel = (event) => {
+  const handleSelectChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const channelId = event.target.value;
-    setSelectedChannel(channelId);
+    const channelId = event.currentTarget.value;
+    setSelectedChannel(parseInt(channelId));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
     axios
@@ -151,9 +169,11 @@ export default function Channels() {
       });
   };
 
-  const handleSelectPublicChannel = (event) => {
+  const handleSelectPublicChannel = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
-    const channelId = event.target.value;
+    const channelId = event.currentTarget.value;
 
     axios
       .post(
@@ -168,7 +188,7 @@ export default function Channels() {
       .then((response) => {
         toast.success("채널에 참여했습니다.");
         fetchChannels();
-        setSelectedChannel(channelId);
+        setSelectedChannel(parseInt(channelId));
       })
       .catch((error) => {
         console.error(error);
@@ -192,10 +212,10 @@ export default function Channels() {
       });
   }, []);
 
-  const handleLeaveChannel = (event) => {
+  const handleLeaveChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
     axios
       .post(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/${event.target.value}/leave`,
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/${event.currentTarget.value}/leave`,
         {},
         {
           headers: {
@@ -299,13 +319,13 @@ export default function Channels() {
             </li>
           ))}
       </ul>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
         />
-        <button onClick={handleSubmit}>전송</button>
+        <button>전송</button>
       </form>
     </div>
   );

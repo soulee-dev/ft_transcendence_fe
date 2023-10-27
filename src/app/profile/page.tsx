@@ -2,40 +2,51 @@
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Cookies from "js-cookie";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+
+interface UserData {
+  name: string;
+  email: string;
+  is_2fa: boolean;
+  profile_image?: string;
+}
 
 export default function Profile() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [is2fa, setIs2fa] = useState(false);
-  const [userData, setUserData] = useState({});
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [is2fa, setIs2fa] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserData>({
+    name: "",
+    email: "",
+    is_2fa: false,
+  });
 
   const fetchUser = () => {
     const access_token = Cookies.get("access_token");
 
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+      .get<UserData>(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
         headers: {
           Authorization: `Bearer ${access_token}`,
         },
       })
-      .then((response) => {
+      .then((response: AxiosResponse<UserData>) => {
         const data = response.data;
         setName(data.name);
         setEmail(data.email);
         setIs2fa(data.is_2fa);
         setUserData(data);
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         console.error(error);
       });
   };
 
   useEffect(() => fetchUser(), []);
 
-  const handleUpdate = (event) => {
+  const handleUpdate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
     const updateData = { name, email, is_2fa: is2fa };
@@ -46,18 +57,24 @@ export default function Profile() {
           Authorization: `Bearer ${access_token}`,
         },
       })
-      .then((response) => {
+      .then((response: AxiosResponse) => {
         toast.success("프로필을 업데이트했습니다.");
-        fetchUser(); // Assuming fetchUser is a function you have that fetches user data.
+        fetchUser();
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         console.error(error);
       });
   };
+
   return (
     <div>
       <ToastContainer />
-      <img src={userData.profile_image} width={100} height={100}></img>
+      <img
+        src={userData.profile_image}
+        width={100}
+        height={100}
+        alt="Profile"
+      />
       <form onSubmit={handleUpdate}>
         <label htmlFor="name">이름</label>
         <br />
@@ -65,7 +82,9 @@ export default function Profile() {
           type="text"
           id="name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setName(e.target.value)
+          }
           placeholder="Name"
         />
         <br />
@@ -75,7 +94,9 @@ export default function Profile() {
           type="checkbox"
           id="is_2fa"
           checked={is2fa}
-          onChange={(e) => setIs2fa(e.target.checked)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setIs2fa(e.target.checked)
+          }
         />
         <br />
         <label htmlFor="email">이메일</label>
@@ -84,7 +105,9 @@ export default function Profile() {
           type="email"
           id="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
         />
         <br />
         <button type="submit">저장하기</button>

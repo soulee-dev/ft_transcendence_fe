@@ -18,8 +18,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [access_token, setAccessToken] = useState<string | null>(null);
-  const socket = useContext(SocketContext);
-
   useEffect(() => {
     const access_token = Cookies.get("access_token");
     setAccessToken(access_token || null);
