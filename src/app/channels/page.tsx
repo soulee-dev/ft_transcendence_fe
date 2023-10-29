@@ -2,9 +2,10 @@
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { SocketContext } from "../../contexts/SocketContext";
 
 type ChatData = {
   sent_by_id: number;
@@ -23,7 +24,7 @@ type ChannelData = {
 };
 
 export default function () {
-  const [channels, setChannels] = useState<ChannelData[]>([]);
+  const [joinedChannels, setJoinedChannels] = useState<ChannelData[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<number>(0);
   const [messages, setMessages] = useState<
     { chat: ChatData; sender: UserData }[]
@@ -36,6 +37,59 @@ export default function () {
   const [userList, setUserList] = useState<string[]>([]);
   const selectOption: string[] = ["PUBLIC", "PRIVATE"];
   const [selected, setSelected] = useState<string>(selectOption[0]);
+  const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    if (socket) {
+      console.log("socket on");
+      socket.on("notification", (message: any) => {
+        console.log(message);
+        toast.success(message.message);
+        if (
+          message.type == "REQUESTED_FRIEND" ||
+          message.type == "DELETED_FRIEND" ||
+          message.type == "ACCEPTED_YOUR_REQ" ||
+          message.type == "DECLINED_YOUR_REQ" ||
+          message.type == "ADDED_TO_CHANNEL"
+        ) {
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        console.log("socket off");
+        socket.off("notification");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      joinedChannels.forEach((channel) => {
+        console.log(`Joining channel socket ${channel.id}`);
+        socket.emit("joinChannel", channel.id, (response: any) => {
+          console.log(
+            "Server acknowledged joinChannel with response:",
+            response
+          );
+        });
+      });
+      socket.on("newMessage", (message: any) => {
+        toast.success(`새로운 메시지가 도착했습니다. ${message}`);
+        console.log(message);
+      });
+    }
+    return () => {
+      if (socket) {
+        console.log("socket off channel notification");
+        joinedChannels.forEach((channel) => {
+          socket.off("joinChannel", channel.id);
+        });
+        socket.emit("logout");
+      }
+    };
+  }, [socket, joinedChannels]);
 
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
@@ -66,7 +120,7 @@ export default function () {
       })
       .then((response) => {
         toast.success("채널이 생성되었습니다.");
-        fetchChannels();
+        fetchJoinedChannels();
       })
       .catch((error) => {
         console.error("채팅방 생성 중 오류 발생:", error);
@@ -74,7 +128,7 @@ export default function () {
       });
   };
 
-  const fetchChannels = () => {
+  const fetchJoinedChannels = () => {
     const access_token = Cookies.get("access_token");
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/joined`, {
@@ -83,7 +137,7 @@ export default function () {
         },
       })
       .then((response) => {
-        setChannels(response.data);
+        setJoinedChannels(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -92,7 +146,7 @@ export default function () {
   };
 
   useEffect(() => {
-    fetchChannels();
+    fetchJoinedChannels();
   }, []);
 
   useEffect(() => {
@@ -187,7 +241,7 @@ export default function () {
       )
       .then((response) => {
         toast.success("채널에 참여했습니다.");
-        fetchChannels();
+        fetchJoinedChannels();
         setSelectedChannel(parseInt(channelId));
       })
       .catch((error) => {
@@ -225,7 +279,7 @@ export default function () {
       )
       .then((response) => {
         toast.success("채널에서 나갔습니다.");
-        fetchChannels();
+        fetchJoinedChannels();
       })
       .catch((error) => {
         console.error(error);
@@ -233,7 +287,6 @@ export default function () {
       });
   };
 
-  console.log(publicChannels);
   return (
     <div>
       <ToastContainer />
@@ -296,9 +349,9 @@ export default function () {
       <h1>채널 목록</h1>
       <h1>현재 선택된 채널: {selectedChannel}</h1>
       <ul>
-        {channels &&
-          channels.length > 0 &&
-          channels.map((channel) => (
+        {joinedChannels &&
+          joinedChannels.length > 0 &&
+          joinedChannels.map((channel) => (
             <li key={channel.id}>
               <button value={channel.id} onClick={handleSelectChannel}>
                 {channel.name}

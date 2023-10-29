@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 interface SocketContextProps {
   on: any;
   off: any;
+  emit: any;
 }
 
 export const SocketContext = createContext<SocketContextProps | null>(null);
