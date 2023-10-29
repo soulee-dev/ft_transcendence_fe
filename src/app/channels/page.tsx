@@ -64,33 +64,6 @@ export default function () {
     };
   }, [socket]);
 
-  useEffect(() => {
-    if (socket) {
-      joinedChannels.forEach((channel) => {
-        console.log(`Joining channel socket ${channel.id}`);
-        socket.emit("joinChannel", channel.id, (response: any) => {
-          console.log(
-            "Server acknowledged joinChannel with response:",
-            response
-          );
-        });
-      });
-      socket.on("newMessage", (message: any) => {
-        toast.success(`새로운 메시지가 도착했습니다. ${message}`);
-        console.log(message);
-      });
-    }
-    return () => {
-      if (socket) {
-        console.log("socket off channel notification");
-        joinedChannels.forEach((channel) => {
-          socket.off("joinChannel", channel.id);
-        });
-        socket.emit("logout");
-      }
-    };
-  }, [socket, joinedChannels]);
-
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
   };
