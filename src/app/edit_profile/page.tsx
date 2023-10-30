@@ -13,7 +13,7 @@ interface UserData {
   profile_image: string;
 }
 
-export default function Profile() {
+export default function EditProfile() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [is2fa, setIs2fa] = useState<boolean>(false);

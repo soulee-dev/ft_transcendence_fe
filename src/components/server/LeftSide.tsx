@@ -26,7 +26,7 @@ function LeftSide() {
       <ToastContainer />
       <ul>
         <li>
-          <Link href="/profile">마이페이지</Link>
+          <Link href="/edit_profile">마이페이지</Link>
         </li>
         <li>
           <Link href="/channels">채팅방</Link>
@@ -36,6 +36,9 @@ function LeftSide() {
         </li>
         <li>
           <Link href="/friends">친구</Link>
+        </li>
+        <li>
+          <Link href="/blcok">차단</Link>
         </li>
         <li>
           <a href="/" onClick={handleLogout}>
