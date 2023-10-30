@@ -9,6 +9,8 @@ import { SocketProvider } from "../contexts/SocketContext";
 import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { parseJWT } from "../utils/jwt";
+import { redirect, usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,16 +19,25 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [access_token, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState({
+    raw: "",
+    sub: "",
+    is_2fa: false,
+  });
+
   useEffect(() => {
     const access_token = Cookies.get("access_token");
-    setAccessToken(access_token || null);
+    if (!access_token) return;
+    setAccessToken({
+      raw: access_token,
+      sub: parseJWT(access_token)?.payload?.sub ?? "",
+      is_2fa: parseJWT(access_token)?.payload?.["2fa"] ?? true,
+    });
   }, []);
 
   useEffect(() => {
     const updateOnlineStatus = () => {
-      const access_token = Cookies.get("access_token");
-      if (!access_token) return;
+      if (!accessToken.raw || !accessToken.is_2fa) return;
       console.log("online");
       const userData = {
         status: "online",
@@ -36,15 +47,14 @@ export default function RootLayout({
         userData,
         {
           headers: {
-            Authorization: `Bearer ${access_token}`,
+            Authorization: `Bearer ${accessToken.raw}`,
           },
         }
       );
     };
 
     const updateOfflineStatus = () => {
-      const access_token = Cookies.get("access_token");
-      if (!access_token) return;
+      if (!accessToken.raw || !accessToken.is_2fa) return;
       console.log("offline");
       const userData = {
         status: "offline",
@@ -54,7 +64,7 @@ export default function RootLayout({
         userData,
         {
           headers: {
-            Authorization: `Bearer ${access_token}`,
+            Authorization: `Bearer ${accessToken.raw}`,
           },
         }
       );
@@ -69,12 +79,17 @@ export default function RootLayout({
       window.removeEventListener("offline", updateOfflineStatus);
       window.removeEventListener("beforeunload", updateOfflineStatus);
     };
-  }, [access_token]);
+  }, [accessToken]);
+
+  const pageName = usePathname().split("/")[1];
+
+  if (pageName != "2fa" && !accessToken.is_2fa)
+    redirect(`/2fa/${accessToken.sub}`);
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        {access_token ? (
+        {accessToken.raw ? (
           <SocketProvider>
             <TopNavigator />
             <div className="main">

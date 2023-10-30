@@ -9,6 +9,7 @@ import axios from "axios";
 function LeftSide() {
   const updateOfflineStatus = () => {
     const access_token = Cookies.get("access_token");
+
     if (!access_token) return;
     console.log("offline");
     const userData = {
