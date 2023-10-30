@@ -24,6 +24,7 @@ type ChannelData = {
 };
 
 export default function () {
+  const [userData, setUserData] = useState({} as UserData);
   const [joinedChannels, setJoinedChannels] = useState<ChannelData[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<number>(0);
   const [messages, setMessages] = useState<
@@ -140,6 +141,21 @@ export default function () {
 
   useEffect(() => {
     fetchJoinedChannels();
+    const access_token = Cookies.get("access_token");
+
+    axios
+      .get<UserData>(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        setUserData(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
   }, []);
 
   useEffect(() => {
@@ -211,6 +227,16 @@ export default function () {
       .then((response) => {
         toast.success("메시지를 전송했습니다.");
         setMessageText("");
+        setMessages((prev) => [
+          ...prev,
+          {
+            chat: response.data,
+            sender: {
+              id: response.data.sent_by_id,
+              name: userData.name,
+            },
+          },
+        ]);
       })
       .catch((error) => {
         console.error(error);
