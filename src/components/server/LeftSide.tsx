@@ -4,10 +4,26 @@ import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 function LeftSide() {
+  const updateOfflineStatus = () => {
+    const access_token = Cookies.get("access_token");
+    if (!access_token) return;
+    console.log("offline");
+    const userData = {
+      status: "offline",
+    };
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/me/update`, userData, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  };
+
   const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    updateOfflineStatus();
     Cookies.remove("access_token");
     toast.success(
       <>
