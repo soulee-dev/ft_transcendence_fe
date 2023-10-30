@@ -8,7 +8,6 @@ import TopNavigator from "../components/server/TopNavigator";
 import { SocketProvider } from "../contexts/SocketContext";
 import Cookies from "js-cookie";
 import { useState, useEffect, useContext } from "react";
-import { SocketContext } from "../contexts/SocketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 

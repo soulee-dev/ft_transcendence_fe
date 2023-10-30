@@ -31,7 +31,9 @@ export default function Block() {
                 },
               }
             )
-            .then((userInfoResponse) => userInfoResponse.data);
+            .then((userInfoResponse) => {
+              return { blockData: blockData, userData: userInfoResponse.data };
+            });
         });
         return Promise.all(fetchUserInfosPromises);
       })
@@ -48,9 +50,7 @@ export default function Block() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const access_token = Cookies.get("access_token");
-
     axios
       .post(
         `${process.env.NEXT_PUBLIC_API_URL}/blocked/add?name=${block}`,
@@ -61,6 +61,7 @@ export default function Block() {
       )
       .then((response: AxiosResponse) => {
         toast.success("차단되었습니다.");
+        fetchBlockList();
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -68,14 +69,39 @@ export default function Block() {
       });
   };
 
-  console.log(blockList);
+  const handleUnBlock = (id: string) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/blocked/${id}/delete`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("access_token")}` },
+        }
+      )
+      .then((response: AxiosResponse) => {
+        toast.success("차단이 해제되었습니다.");
+        fetchBlockList();
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
   return (
     <div>
       <ToastContainer />
       <h1>차단 목록</h1>
       <ul>
-        {blockList.length > 0 &&
-          blockList.map((block, index) => <li key={index}>{block.name}</li>)}
+        {blockList &&
+          blockList.length > 0 &&
+          blockList.map((block, index) => (
+            <li key={block.userData.name}>
+              <span>{block.userData.name}</span>
+              <button onClick={() => handleUnBlock(block.blockData.id)}>
+                삭제
+              </button>
+            </li>
+          ))}
       </ul>
       <h1>차단하기</h1>
       <form onSubmit={handleSubmit}>
