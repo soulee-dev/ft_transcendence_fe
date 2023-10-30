@@ -10,17 +10,19 @@ interface UserData {
   name: string;
   email: string;
   is_2fa: boolean;
-  profile_image?: string;
+  profile_image: string;
 }
 
 export default function Profile() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [is2fa, setIs2fa] = useState<boolean>(false);
+  const [profileImage, setProfileImage] = useState<string>("");
   const [userData, setUserData] = useState<UserData>({
     name: "",
     email: "",
     is_2fa: false,
+    profile_image: "",
   });
 
   const fetchUser = () => {
@@ -37,6 +39,7 @@ export default function Profile() {
         setName(data.name);
         setEmail(data.email);
         setIs2fa(data.is_2fa);
+        setProfileImage(data.profile_image);
         setUserData(data);
       })
       .catch((error: AxiosError) => {
@@ -49,7 +52,12 @@ export default function Profile() {
   const handleUpdate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
-    const updateData = { name, email, is_2fa: is2fa };
+    const updateData = {
+      name,
+      email,
+      is_2fa: is2fa,
+      profile_image: profileImage,
+    };
     axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/users/me/update`, updateData, {
         headers: {
@@ -82,9 +90,7 @@ export default function Profile() {
           type="text"
           id="name"
           value={name}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setName(e.target.value)
-          }
+          onChange={(e) => setName(e.target.value)}
           placeholder="Name"
         />
         <br />
@@ -94,9 +100,7 @@ export default function Profile() {
           type="checkbox"
           id="is_2fa"
           checked={is2fa}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setIs2fa(e.target.checked)
-          }
+          onChange={(e) => setIs2fa(e.target.checked)}
         />
         <br />
         <label htmlFor="email">이메일</label>
@@ -105,10 +109,18 @@ export default function Profile() {
           type="email"
           id="email"
           value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
-          }
+          onChange={(e) => setEmail(e.target.value)}
         />
+        <br />
+        <label htmlFor="profile_image">프로필 이미지</label>
+        <br />
+        <input
+          type="text"
+          id="profile_image"
+          value={profileImage}
+          onChange={(e) => setProfileImage(e.target.value)}
+        />
+
         <br />
         <button type="submit">저장하기</button>
       </form>
