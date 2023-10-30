@@ -19,6 +19,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pageName = usePathname().split("/")[1];
   const [accessToken, setAccessToken] = useState({
     raw: "",
     sub: "",
@@ -69,6 +70,7 @@ export default function RootLayout({
         }
       );
     };
+
     window.addEventListener("online", updateOnlineStatus);
     window.addEventListener("offline", updateOfflineStatus);
     window.addEventListener("beforeunload", updateOfflineStatus);
@@ -81,9 +83,7 @@ export default function RootLayout({
     };
   }, [accessToken]);
 
-  const pageName = usePathname().split("/")[1];
-
-  if (pageName != "2fa" && !accessToken.is_2fa)
+  if (accessToken.raw && pageName != "2fa" && !accessToken.is_2fa)
     redirect(`/2fa/${accessToken.sub}`);
 
   return (
