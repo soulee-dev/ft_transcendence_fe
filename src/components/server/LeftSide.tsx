@@ -38,7 +38,7 @@ function LeftSide() {
           <Link href="/friends">친구</Link>
         </li>
         <li>
-          <Link href="/blcok">차단</Link>
+          <Link href="/block">차단</Link>
         </li>
         <li>
           <a href="/" onClick={handleLogout}>

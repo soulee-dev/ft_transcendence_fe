@@ -49,7 +49,7 @@ export default function () {
           if (message.channelId == selectedChannel) {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/${message.userId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${Cookies.get("access_token")}`,
@@ -67,7 +67,9 @@ export default function () {
               })
               .catch((error) => {
                 console.error(error);
-                toast.error(error.message);
+                toast.error(
+                  (error.response?.data as { message: string })?.message
+                );
               });
           }
         }
@@ -115,7 +117,7 @@ export default function () {
       })
       .catch((error) => {
         console.error("채팅방 생성 중 오류 발생:", error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -132,7 +134,7 @@ export default function () {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -154,7 +156,7 @@ export default function () {
         const fetchUserInfosPromises = data.map((chatData: ChatData) => {
           return axios
             .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/${chatData.sent_by_id}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${chatData.sent_by_id}`,
               {
                 headers: {
                   Authorization: `Bearer ${access_token}`,
@@ -169,7 +171,9 @@ export default function () {
             })
             .catch((error) => {
               console.error(error);
-              toast.error(error.message);
+              toast.error(
+                (error.response?.data as { message: string })?.message
+              );
             });
         });
         return Promise.all(fetchUserInfosPromises);
@@ -210,7 +214,7 @@ export default function () {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -237,7 +241,7 @@ export default function () {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -253,7 +257,7 @@ export default function () {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   }, []);
 
@@ -274,7 +278,7 @@ export default function () {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 

@@ -38,7 +38,7 @@ export default function Friends() {
         const fetchUserInfosPromises = data.map((friendData: any) => {
           return axios
             .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/${friendData.friend_id}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${friendData.friend_id}`,
               {
                 headers: {
                   Authorization: `Bearer ${access_token}`,
@@ -74,7 +74,7 @@ export default function Friends() {
           (request: FriendRequest) => {
             return axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/${request.sender_id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/users/id/${request.sender_id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${access_token}`,
@@ -147,7 +147,7 @@ export default function Friends() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
@@ -171,7 +171,7 @@ export default function Friends() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
@@ -194,7 +194,7 @@ export default function Friends() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
@@ -217,7 +217,7 @@ export default function Friends() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
@@ -239,7 +239,7 @@ export default function Friends() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
