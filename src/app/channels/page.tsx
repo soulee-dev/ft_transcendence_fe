@@ -45,13 +45,31 @@ export default function () {
       socket.on("notification", (message: any) => {
         console.log(message);
         toast.success(message.message);
-        if (
-          message.type == "REQUESTED_FRIEND" ||
-          message.type == "DELETED_FRIEND" ||
-          message.type == "ACCEPTED_YOUR_REQ" ||
-          message.type == "DECLINED_YOUR_REQ" ||
-          message.type == "ADDED_TO_CHANNEL"
-        ) {
+        if (message.type == "SENT_MESSAGE") {
+          if (message.channelId == selectedChannel) {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/users/${message.userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get("access_token")}`,
+                  },
+                }
+              )
+              .then((userInfoResponse) => {
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    chat: message,
+                    sender: userInfoResponse.data,
+                  },
+                ]);
+              })
+              .catch((error) => {
+                console.error(error);
+                toast.error(error.message);
+              });
+          }
         }
       });
     }
@@ -62,7 +80,7 @@ export default function () {
         socket.off("notification");
       }
     };
-  }, [socket]);
+  }, [socket, selectedChannel]);
 
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
@@ -339,8 +357,8 @@ export default function () {
       <ul>
         {messages &&
           messages.length > 0 &&
-          messages.map((message) => (
-            <li key={message.chat.id}>
+          messages.map((message, index) => (
+            <li key={index}>
               {message.sender.name}: {message.chat.message}
             </li>
           ))}
