@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import Engine from "../../game/engine/Engine";
-import GameModeClient from "../../game/gamemode/GameModeClient";
+import Engine from "../../core/engine/Engine";
+import GameModeClient from "../../core/gameplay/GameModeClient";
 
 const CANVAS_WIDTH: number = 502;
 const CANVAS_HEIGHT: number = 727;
@@ -14,12 +14,15 @@ function Game(props: any) {
 	);
 
 	useEffect(() => {
-		console.log("Game component mounted.");
 		if (canvasRef.current) {
 			const canvas = canvasRef.current!;
 			engineRef.current.init(canvas, backgroundRef.current!);
 			gameModeRef.current.startMatch();
 		}
+
+		return () => {
+			gameModeRef.current.endMatch();
+		};
 	}, [canvasRef]);
 
 	return (

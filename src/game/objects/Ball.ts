@@ -1,9 +1,8 @@
-import Paddle from "./Paddle";
-import GameObject from "./GameObject";
+import GameObject from "../../core/gameobject/GameObject";
+import CollisionBox from "../../core/engine/CollisionBox";
 
 class Ball extends GameObject {
 	radius: number;
-	// color: string;
 
 	constructor(
 		x: number,
@@ -17,56 +16,9 @@ class Ball extends GameObject {
 		this.radius = radius;
 		this.dx = dx;
 		this.dy = dy;
+		this.collisionBox = new CollisionBox(x, y, radius * 2, radius * 2);
 		this.color = color;
 	}
-
-	collisionDetection = (
-		myPaddle: Paddle,
-		opponentPaddle: Paddle,
-		width: number,
-		height: number
-	) => {
-		this.collisionDetectionWithPaddle(myPaddle, opponentPaddle);
-		this.collisionDetectionWithWall(width, height);
-	};
-
-	private collisionDetectionWithPaddle = (
-		myPaddle: Paddle,
-		opponentPaddle: Paddle
-	) => {
-		if (
-			this._y + this.radius > myPaddle._y &&
-			this._x > myPaddle._x &&
-			this._x < myPaddle._x + myPaddle.width
-		) {
-			this.dx *= 1.1;
-			this.dy = -this.dy;
-		}
-		if (
-			this._y - this.radius < opponentPaddle._y + opponentPaddle.height &&
-			this._x > opponentPaddle.width &&
-			this._x < opponentPaddle._x + opponentPaddle.width
-		) {
-			this.dx *= 1.1;
-			this.dy = -this.dy;
-		}
-	};
-
-	private collisionDetectionWithWall = (width: number, height: number) => {
-		if (this._y + this.radius > height) {
-			this.color = "red";
-			this.dy = -this.dy;
-		} else if (this._y - this.radius < 0) {
-			this.color = "red";
-			this.dy = -this.dy;
-		}
-		if (this._x + this.radius > width || this._x - this.radius < 0) {
-			this.dx = -this.dx;
-		}
-		// if (scoreRef.current.player1 >= 5 || scoreRef.current.player2 >= 5) {
-		// 	isPlaying = false;
-		// }
-	};
 
 	SetDirection = (dx: number, dy: number) => {
 		this.dx = dx;
@@ -81,8 +33,15 @@ class Ball extends GameObject {
 	};
 
 	update = (deltaTime: number) => {
+		const hitResult = this.collisionBox.checkCollisionWithWall(502, 727);
+		if (hitResult.isHit) {
+			this.dx = hitResult.x ? -this.dx : this.dx;
+			this.dy = hitResult.y ? -this.dy : this.dy;
+		}
 		this._x += this.dx * deltaTime;
+		this.collisionBox.x = this._x;
 		this._y += this.dy * deltaTime;
+		this.collisionBox.y = this._y;
 	};
 }
 

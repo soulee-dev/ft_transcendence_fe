@@ -1,4 +1,5 @@
-import GameObject from "./GameObject";
+import CollisionBox from "../../core/engine/CollisionBox";
+import GameObject from "../../core/gameobject/GameObject";
 import { clamp } from "../../utils/clamp";
 
 class Paddle extends GameObject {
@@ -15,6 +16,7 @@ class Paddle extends GameObject {
 		super(x, y, dx, dy);
 		this.width = width;
 		this.height = height;
+		this.collisionBox = new CollisionBox(x, y, width, height);
 	}
 
 	render = (context: CanvasRenderingContext2D) => {
@@ -23,9 +25,7 @@ class Paddle extends GameObject {
 	};
 
 	update = (deltaTime: number) => {
-		// console.log(deltaTime);
 		this._x = clamp(this._x + this.dx * deltaTime, 0, 502 - this.width);
-		// this._x += this.dx * deltaTime;
 	};
 }
 

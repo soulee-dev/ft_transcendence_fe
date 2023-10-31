@@ -1,4 +1,4 @@
-import GameObject from "../objects/GameObject";
+import GameObject from "../../core/gameobject/GameObject";
 
 class Player {
 	private _nickname: string | null = null;
