@@ -1,11 +1,9 @@
 import Paddle from "./Paddle";
-import Movable from "./Movable";
+import GameObject from "./GameObject";
 
-class Ball extends Movable {
+class Ball extends GameObject {
 	radius: number;
-	dx: number;
-	dy: number;
-	color: string;
+	// color: string;
 
 	constructor(
 		x: number,
@@ -15,7 +13,7 @@ class Ball extends Movable {
 		dy: number,
 		color: string
 	) {
-		super(x, y);
+		super(x, y, dx, dy);
 		this.radius = radius;
 		this.dx = dx;
 		this.dy = dy;
@@ -73,6 +71,18 @@ class Ball extends Movable {
 	SetDirection = (dx: number, dy: number) => {
 		this.dx = dx;
 		this.dy = dy;
+	};
+
+	render = (context: CanvasRenderingContext2D) => {
+		context.fillStyle = this.color;
+		context.beginPath();
+		context.arc(this._x, this._y, this.radius, 0, Math.PI * 2);
+		context.fill();
+	};
+
+	update = (deltaTime: number) => {
+		this._x += this.dx * deltaTime;
+		this._y += this.dy * deltaTime;
 	};
 }
 

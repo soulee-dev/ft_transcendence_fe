@@ -1,3 +1,5 @@
+"use client";
+import ContextMenu from "../client/ContextMenu";
 function RightSide() {
 	return (
 		<div className="rightSide">
@@ -183,7 +185,26 @@ function RightSide() {
 			<div className="addFriendBtn">
 				<div className="addFriendText">친구 추가</div>
 			</div> */}
-			Right Side
+			{/* <div className="wrapper">
+				<div
+					id="defaultContextmenuArea"
+					className="defaultContextmenuArea"
+				></div>
+				<div
+					id="customContextmenuArea1"
+					className="customContextmenuArea1"
+				>
+					<ContextMenu
+						targetId="customContextmenuArea1"
+						options={["View", "Update", "Delete"]}
+						classes={{
+							listWrapper: "customContextmenuArea1ListWrapper",
+							listItem: "customContextmenuArea1ListItem",
+						}}
+					/>
+				</div>
+			</div> */}
+			Right
 		</div>
 	);
 }
