@@ -40,12 +40,48 @@ export default function () {
   const [selected, setSelected] = useState<string>(selectOption[0]);
   const socket = useContext(SocketContext);
 
+  const fetchJoinedChannels = () => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/joined`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response) => {
+        setJoinedChannels(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
+
+  const fetchPublicChannels = () => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("access_token")}`,
+        },
+      })
+      .then((response) => {
+        setPublicChannels(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
+
   useEffect(() => {
     if (socket) {
       console.log("socket on");
       socket.on("notification", (message: any) => {
         console.log(message);
         toast.success(message.message);
+        if (message.type == "PUBLIC_CHANNEL_CREATED") {
+          fetchPublicChannels();
+        }
         if (message.type == "SENT_MESSAGE") {
           if (message.channelId == selectedChannel) {
             axios
@@ -122,25 +158,9 @@ export default function () {
       });
   };
 
-  const fetchJoinedChannels = () => {
-    const access_token = Cookies.get("access_token");
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/joined`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      })
-      .then((response) => {
-        setJoinedChannels(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error((error.response?.data as { message: string })?.message);
-      });
-  };
-
   useEffect(() => {
     fetchJoinedChannels();
+    fetchPublicChannels();
     const access_token = Cookies.get("access_token");
 
     axios
@@ -270,22 +290,6 @@ export default function () {
         toast.error((error.response?.data as { message: string })?.message);
       });
   };
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("access_token")}`,
-        },
-      })
-      .then((response) => {
-        setPublicChannels(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error((error.response?.data as { message: string })?.message);
-      });
-  }, []);
 
   const handleLeaveChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
     axios

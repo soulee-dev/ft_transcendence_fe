@@ -1,6 +1,6 @@
 "use client";
 
-import "./globals.css";
+// import "./globals.css";
 import { Inter } from "next/font/google";
 import LeftSide from "../components/server/LeftSide";
 import RightSide from "../components/server/RightSide";
