@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { parseJWT } from "../../utils/jwt";
 
 function LeftSide() {
   const updateOfflineStatus = () => {
@@ -24,7 +25,12 @@ function LeftSide() {
 
   const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    updateOfflineStatus();
+    const is_2fa =
+      parseJWT(Cookies.get("access_token") ?? "")?.payload?.["2fa"] ?? true;
+    if (is_2fa) {
+      updateOfflineStatus();
+    }
+
     Cookies.remove("access_token");
     toast.success(
       <>
