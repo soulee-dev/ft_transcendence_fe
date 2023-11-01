@@ -77,7 +77,9 @@ export default function Channels() {
   const [selected, setSelected] = useState<string>(selectOption[0]);
   const socket = useContext(SocketContext);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [privateModalIsOpen, setPrivateModalIsOpen] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
+  const [privateChannelName, setPrivateChannelName] = useState<string>("");
 
   function openModal() {
     setModalIsOpen(true);
@@ -87,14 +89,47 @@ export default function Channels() {
     setModalIsOpen(false);
   }
 
+  function openPrivateModal() {
+    setPrivateModalIsOpen(true);
+  }
+
+  function closePrivateModal() {
+    setPrivateModalIsOpen(false);
+  }
+
   const fetchChannels = () => {
     fetchJoinedChannels();
     fetchPublicChannels();
   };
 
+  const handlePrivatePasswordSubmit = (
+    evnet: React.FormEvent<HTMLFormElement>
+  ) => {
+    evnet.preventDefault();
+    console.log(selectedChannel, joinPassword);
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/join?name=${privateChannelName}&password=${joinPassword}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("access_token")}`,
+          },
+        }
+      )
+      .then((response) => {
+        toast.success("채널에 참여했습니다.");
+        fetchChannels();
+        closePrivateModal();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
+
   const handlePasswordSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(selectedChannel, joinPassword);
     axios
       .post(
         `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/join?password=${joinPassword}`,
@@ -392,6 +427,33 @@ export default function Channels() {
       });
   };
 
+  const handleJoinPrivateSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    console.log(privateChannelName);
+    event.preventDefault();
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/join?name=${privateChannelName}&password=${password}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("access_token")}`,
+          },
+        }
+      )
+      .then((response) => {
+        toast.success("채널에 참여했습니다.");
+        fetchChannels();
+      })
+      .catch((error) => {
+        console.error(error);
+        if (error.response?.status == 401) {
+          openPrivateModal();
+        } else {
+          toast.error((error.response?.data as { message: string })?.message);
+        }
+      });
+  };
+
   return (
     <div>
       <ToastContainer />
@@ -401,6 +463,13 @@ export default function Channels() {
         joinPassword={joinPassword}
         setJoinPassword={setJoinPassword}
         onSubmit={handlePasswordSubmit}
+      />
+      <PasswordModal
+        isOpen={privateModalIsOpen}
+        onRequestClose={closePrivateModal}
+        joinPassword={joinPassword}
+        setJoinPassword={setJoinPassword}
+        onSubmit={handlePrivatePasswordSubmit}
       />
       <div>
         <h1>채팅방 생성하기</h1>
@@ -443,6 +512,15 @@ export default function Channels() {
         </ul>
         <button onClick={() => handleCreateChannel()}>채팅방 만들기</button>
       </div>
+      <h1>비공개 채팅방 들어가기</h1>
+      <form onSubmit={handleJoinPrivateSubmit}>
+        <input
+          type="text"
+          value={privateChannelName}
+          onChange={(e) => setPrivateChannelName(e.target.value)}
+        ></input>
+        <button>입장</button>
+      </form>
       <h1>공개 채팅방 목록</h1>
       {
         <ul>
