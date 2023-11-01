@@ -6,6 +6,7 @@ import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
+import Modal from "react-modal";
 
 type ChatData = {
   sent_by_id: number;
@@ -23,7 +24,43 @@ type ChannelData = {
   name: string;
 };
 
-export default function () {
+interface PasswordModalProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+  joinPassword: string;
+  setJoinPassword: React.Dispatch<React.SetStateAction<string>>;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+}
+
+export const PasswordModal: React.FC<PasswordModalProps> = ({
+  isOpen,
+  onRequestClose,
+  joinPassword,
+  setJoinPassword,
+  onSubmit,
+}) => (
+  <Modal
+    isOpen={isOpen}
+    ariaHideApp={false}
+    onRequestClose={onRequestClose}
+    contentLabel="비밀번호 입력"
+  >
+    <h2>비밀번호를 입력해주세요</h2>
+    <form onSubmit={onSubmit}>
+      <input
+        name="joinPassword"
+        type="password"
+        placeholder="비밀번호"
+        value={joinPassword}
+        onChange={(e) => setJoinPassword(e.target.value)}
+      />
+      <button type="submit">입력</button>
+    </form>
+    <button onClick={onRequestClose}>닫기</button>
+  </Modal>
+);
+
+export default function Channels() {
   const [userData, setUserData] = useState({} as UserData);
   const [joinedChannels, setJoinedChannels] = useState<ChannelData[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<number>(0);
@@ -39,6 +76,45 @@ export default function () {
   const selectOption: string[] = ["PUBLIC", "PRIVATE"];
   const [selected, setSelected] = useState<string>(selectOption[0]);
   const socket = useContext(SocketContext);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [joinPassword, setJoinPassword] = useState("");
+
+  function openModal() {
+    setModalIsOpen(true);
+  }
+
+  function closeModal() {
+    setModalIsOpen(false);
+  }
+
+  const fetchChannels = () => {
+    fetchJoinedChannels();
+    fetchPublicChannels();
+  };
+
+  const handlePasswordSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(selectedChannel, joinPassword);
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/join?password=${joinPassword}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("access_token")}`,
+          },
+        }
+      )
+      .then((response) => {
+        toast.success("채널에 참여했습니다.");
+        fetchChannels();
+        closeModal();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
 
   const fetchJoinedChannels = () => {
     const access_token = Cookies.get("access_token");
@@ -80,7 +156,7 @@ export default function () {
         console.log(message);
         toast.success(message.message);
         if (message.type == "PUBLIC_CHANNEL_CREATED") {
-          fetchPublicChannels();
+          fetchChannels();
         }
         if (message.type == "SENT_MESSAGE") {
           if (message.channelId == selectedChannel) {
@@ -150,7 +226,7 @@ export default function () {
       })
       .then((response) => {
         toast.success("채널이 생성되었습니다.");
-        fetchJoinedChannels();
+        fetchChannels();
       })
       .catch((error) => {
         console.error("채팅방 생성 중 오류 발생:", error);
@@ -159,8 +235,7 @@ export default function () {
   };
 
   useEffect(() => {
-    fetchJoinedChannels();
-    fetchPublicChannels();
+    fetchChannels();
     const access_token = Cookies.get("access_token");
 
     axios
@@ -282,12 +357,17 @@ export default function () {
       )
       .then((response) => {
         toast.success("채널에 참여했습니다.");
-        fetchJoinedChannels();
+        fetchChannels();
         setSelectedChannel(parseInt(channelId));
       })
       .catch((error) => {
         console.error(error);
-        toast.error((error.response?.data as { message: string })?.message);
+        if (error.response?.status == 401) {
+          setSelectedChannel(parseInt(channelId));
+          openModal();
+        } else {
+          toast.error((error.response?.data as { message: string })?.message);
+        }
       });
   };
 
@@ -304,7 +384,7 @@ export default function () {
       )
       .then((response) => {
         toast.success("채널에서 나갔습니다.");
-        fetchJoinedChannels();
+        fetchChannels();
       })
       .catch((error) => {
         console.error(error);
@@ -315,8 +395,14 @@ export default function () {
   return (
     <div>
       <ToastContainer />
+      <PasswordModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        joinPassword={joinPassword}
+        setJoinPassword={setJoinPassword}
+        onSubmit={handlePasswordSubmit}
+      />
       <div>
-        <ToastContainer />
         <h1>채팅방 생성하기</h1>
         <input
           name="name"
