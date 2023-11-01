@@ -7,7 +7,6 @@ import axios from "axios";
 
 const CANVAS_WIDTH: number = 502;
 const CANVAS_HEIGHT: number = 727;
-const SOCKET_URL = "http://localhost:5000";
 
 let socket: Socket;
 
@@ -22,6 +21,14 @@ function SelectGameMode(props: any) {
 				Game Start
 			</button>
 			<button>Custom Game</button>
+			<button
+				onClick={(event) => {
+					event.preventDefault();
+					props.onChangeMode();
+				}}
+			>
+				일단 하기
+			</button>
 		</div>
 	);
 }
@@ -30,28 +37,28 @@ export default function GamePage() {
 	const [start, setStart] = useState<boolean>(false);
 
 	function handleConnection() {
-		socket = socketIOClient(SOCKET_URL);
+		socket = socketIOClient();
 		socket.on("start", () => {
 			console.log("start event received");
 			setStart(true);
 		});
 	}
 
-	// if (start) {
-	// 	return <Game socket={socket} />;
-	// } else {
-	// 	return (
-	// 		<SelectGameMode
-	// 			onChangeMode={() => {
-	// 				console.log("change mode");
-	// 			}}
-	// 		></SelectGameMode>
-	// 	);
-	// }
-	socket = socketIOClient(SOCKET_URL);
-	socket.on("start", () => {
-		console.log("start event received");
-		setStart(true);
-	});
+	if (start) {
+		return <Game socket={socket} />;
+	} else {
+		return (
+			<SelectGameMode
+				onChangeMode={() => {
+					handleConnection();
+				}}
+			></SelectGameMode>
+		);
+	}
+	// socket = socketIOClient(SOCKET_URL);
+	// socket.on("start", () => {
+	// 	console.log("start event received");
+	// 	setStart(true);
+	// });
 	return <Game socket={socket} />;
 }

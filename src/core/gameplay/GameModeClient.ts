@@ -46,7 +46,7 @@ class GameModeClient {
 			this._engine._canvas!.width / 2,
 			this._engine._canvas!.height / 2,
 			8,
-			0.1,
+			0,
 			0.1,
 			"white"
 		);
@@ -70,7 +70,8 @@ class GameModeClient {
 		);
 
 		this._tempPlayer.possess(myPaddle);
-		this._engine.spawnObject(ball);
+		// this._engine.spawnObject(ball);
+		this._engine._ball = ball;
 		this._engine.spawnObject(myPaddle);
 		this._engine.spawnObject(opponentPaddle);
 		console.log("GameMode startMatch");

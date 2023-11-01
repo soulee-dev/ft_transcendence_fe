@@ -16,7 +16,13 @@ class Ball extends GameObject {
 		this.radius = radius;
 		this.dx = dx;
 		this.dy = dy;
-		this.collisionBox = new CollisionBox(x, y, radius * 2, radius * 2);
+		this.collisionBox = new CollisionBox(
+			this,
+			x,
+			y,
+			radius * 2,
+			radius * 2
+		);
 		this.color = color;
 	}
 
@@ -35,6 +41,7 @@ class Ball extends GameObject {
 	update = (deltaTime: number) => {
 		const hitResult = this.collisionBox.checkCollisionWithWall(502, 727);
 		if (hitResult.isHit) {
+			console.log("wall hit");
 			this.dx = hitResult.x ? -this.dx : this.dx;
 			this.dy = hitResult.y ? -this.dy : this.dy;
 		}

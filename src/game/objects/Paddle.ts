@@ -16,7 +16,7 @@ class Paddle extends GameObject {
 		super(x, y, dx, dy);
 		this.width = width;
 		this.height = height;
-		this.collisionBox = new CollisionBox(x, y, width, height);
+		this.collisionBox = new CollisionBox(this, x, y, width, height);
 	}
 
 	render = (context: CanvasRenderingContext2D) => {
@@ -25,6 +25,7 @@ class Paddle extends GameObject {
 	};
 
 	update = (deltaTime: number) => {
+		// console.log(this.dx, deltaTime);
 		this._x = clamp(this._x + this.dx * deltaTime, 0, 502 - this.width);
 	};
 }

@@ -13,7 +13,7 @@ class GameObject {
 		this._y = y;
 		this.dx = dx;
 		this.dy = dy;
-		this.collisionBox = new CollisionBox(x, y, 0, 0);
+		this.collisionBox = new CollisionBox(this, x, y, 0, 0);
 	}
 
 	render = (context: CanvasRenderingContext2D) => {};

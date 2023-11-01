@@ -1,6 +1,5 @@
 import GameObject from "../gameobject/GameObject";
 import Ball from "../../game/objects/Ball";
-import Paddle from "../../game/objects/Paddle";
 
 class Engine {
 	public _canvas: HTMLCanvasElement | null = null;
@@ -10,6 +9,7 @@ class Engine {
 	private _bisPlaying: boolean;
 	private _lastTime: number = 0;
 	private _pawns: GameObject[] = [];
+	public _ball: Ball;
 
 	constructor() {
 		this._animationID = 0;
@@ -58,23 +58,17 @@ class Engine {
 
 	update = (deltaTime: number) => {
 		if (deltaTime > 0) {
+			this._ball.collisionBox.checkCollision(this._pawns);
+			this._ball.update(deltaTime);
 			this._pawns.forEach((pawn) => {
 				pawn.update(deltaTime);
 			});
-			// const ball = this._pawns[0] as Ball;
-			// const myPaddle = this._pawns[1] as Paddle;
-			// const opponentPaddle = this._pawns[2] as Paddle;
-			// ball!.collisionDetection(
-			// 	myPaddle!,
-			// 	opponentPaddle!,
-			// 	this._canvas!.width,
-			// 	this._canvas!.height
-			// );
 		}
 	};
 
 	draw = (context: CanvasRenderingContext2D) => {
 		context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+		this._ball.render(context);
 		this._pawns.forEach((pawn) => {
 			pawn.render(context);
 		});
