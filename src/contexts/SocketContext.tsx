@@ -1,23 +1,17 @@
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import io from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 
-interface SocketContextProps {
-  on: any;
-  off: any;
-  emit: any;
-}
-
-export const SocketContext = createContext<SocketContextProps | null>(null);
+export const SocketContext = createContext<Socket | null>(null);
 
 interface SocketProviderProps {
   children: ReactNode;
 }
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const [socket, setSocket] = useState<SocketContextProps | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const access_token = Cookies.get("access_token");
 
   useEffect(() => {
