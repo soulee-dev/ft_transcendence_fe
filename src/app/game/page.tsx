@@ -136,14 +136,14 @@ export default function Game() {
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (isGameStarted && socket) {
-      if (event.keyCode === 38) {
+      if (event.key === "ArrowUp") {
         // player move up
         socket.emit("move", {
           roomID: roomID,
           playerNo: playerNo,
           direction: "up",
         });
-      } else if (event.keyCode === 40) {
+      } else if (event.key === "ArrowDown") {
         // player move down
         socket.emit("move", {
           roomID: roomID,
@@ -177,14 +177,12 @@ export default function Game() {
 
     // Set up the styles for the center line
     ctx.strokeStyle = "white";
-    ctx.setLineDash([10, 10]); // This creates a dashed line pattern
+    ctx.setLineDash([10, 10]);
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0); // Start at the top center of the canvas
-    ctx.lineTo(canvas.width / 2, canvas.height); // Draw a line to the bottom center of the canvas
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
 
-    // Draw the players and ball using their draw methods
-    // Note: We're checking if player1, player2, and ball are initialized before calling draw
     player1?.draw(ctx);
     player2?.draw(ctx);
     ball?.draw(ctx);
