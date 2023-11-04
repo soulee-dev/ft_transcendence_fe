@@ -27,7 +27,7 @@ export default function Game() {
 
     socket.on("startingGame", () => {
       setGameStarted(true);
-      setMessage("We are going to start the game...");
+      setMessage("게임이 곧 시작합니다!");
     });
 
     socket.on("startedGame", (room) => {
@@ -114,9 +114,7 @@ export default function Game() {
     socket.on("endGame", (room) => {
       setGameStarted(false);
       console.log(room.winner, playerNo);
-      setMessage(
-        `${room.winner === playerNo ? "You are Winner!" : "You are Loser!"}`
-      );
+      setMessage(`${room.winner === playerNo ? "이겼습니다!" : "졌습니다!"}`);
       socket.emit("leave", roomID);
 
       setTimeout(() => {
@@ -160,9 +158,9 @@ export default function Game() {
     if (socket && socket.connected) {
       setIsButtonVisible(false);
       socket.emit("join");
-      setMessage("Waiting for other player...");
+      setMessage("다른 플레이어를 기다리는 중입니다...");
     } else {
-      setMessage("Refresh the page and try again...");
+      setMessage("화면을 새로고침하고 다시 시도해주세요...");
     }
   };
 
