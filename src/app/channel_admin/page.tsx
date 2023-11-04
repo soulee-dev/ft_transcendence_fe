@@ -19,12 +19,27 @@ export default function ChannelAdmin() {
       })
       .then((res) => {
         setChannels(res.data);
-      })..;
+      })
+      .catch((error) => {
+        toast.error((error.response?.data as { message: string })?.message);
+        console.error(error);
+      });
   };
+
+  interface Channel {
+    id: number;
+    name: string;
+  }
 
   return (
     <div>
       <h1>채널 목록</h1>
+      {channels.map((channel: Channel) => (
+        <div key={channel.id}>
+          <h2>{channel.name}</h2>
+          <button onClick={() => setSelectedChannel(channel.id)}>선택</button>
+        </div>
+      ))}
     </div>
   );
 }
