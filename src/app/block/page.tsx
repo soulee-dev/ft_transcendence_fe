@@ -94,7 +94,7 @@ export default function Block() {
       <ul>
         {blockList &&
           blockList.length > 0 &&
-          blockList.map((block, index) => (
+          blockList.map((block: any, index) => (
             <li key={block.userData.name}>
               <span>{block.userData.name}</span>
               <button onClick={() => handleUnBlock(block.blockData.id)}>
