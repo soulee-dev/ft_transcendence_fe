@@ -20,114 +20,121 @@ export default function Game() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (socket) {
-      socket.on("playerNo", (newPlayerNo: number) => {
-        setPlayerNo(newPlayerNo);
-      });
+    if (!socket) return;
+    socket.on("playerNo", (newPlayerNo: number) => {
+      setPlayerNo(newPlayerNo);
+    });
 
-      socket.on("startingGame", () => {
-        setGameStarted(true);
-        setMessage("We are going to start the game...");
-      });
+    socket.on("startingGame", () => {
+      setGameStarted(true);
+      setMessage("We are going to start the game...");
+    });
 
-      socket.on("startedGame", (room) => {
-        setRoomID(room.id);
-        setMessage("");
+    socket.on("startedGame", (room) => {
+      setRoomID(room.id);
+      setMessage("");
 
-        const p1 = new Player(
-          room.players[0].x,
+      const p1 = new Player(
+        room.players[0].x,
+        room.players[0].y,
+        20,
+        60,
+        "red",
+        0
+      );
+      const p2 = new Player(
+        room.players[1].x,
+        room.players[1].y,
+        20,
+        60,
+        "blue",
+        0
+      );
+      const newBall = new Ball(room.ball.x, room.ball.y, 10, "white");
+
+      p1.score = room.players[0].score;
+      p2.score = room.players[1].score;
+
+      setPlayer1(p1);
+      setPlayer2(p2);
+      setBall(newBall);
+    });
+
+    socket.on("updateGame", (room) => {
+      setPlayer1((prevPlayer1) => {
+        if (!prevPlayer1) return null;
+
+        return new Player(
+          prevPlayer1.x,
           room.players[0].y,
-          20,
-          60,
-          "red",
-          0
+          prevPlayer1.width,
+          prevPlayer1.height,
+          prevPlayer1.color,
+          room.players[0].score
         );
-        const p2 = new Player(
-          room.players[1].x,
+      });
+
+      setPlayer2((prevPlayer2) => {
+        if (!prevPlayer2) return null;
+
+        return new Player(
+          prevPlayer2.x,
           room.players[1].y,
-          20,
-          60,
-          "blue",
-          0
+          prevPlayer2.width,
+          prevPlayer2.height,
+          prevPlayer2.color,
+          room.players[1].score
         );
-        const newBall = new Ball(room.ball.x, room.ball.y, 10, "white");
-
-        p1.score = room.players[0].score;
-        p2.score = room.players[1].score;
-
-        setPlayer1(p1);
-        setPlayer2(p2);
-        setBall(newBall);
       });
 
-      socket.on("updateGame", (room) => {
-        setPlayer1((prevPlayer1) => {
-          if (!prevPlayer1) return null;
+      setBall((prevBall) => {
+        if (!prevBall) return null;
 
-          return new Player(
-            prevPlayer1.x,
-            room.players[0].y,
-            prevPlayer1.width,
-            prevPlayer1.height,
-            prevPlayer1.color,
-            room.players[0].score
-          );
-        });
-
-        setPlayer2((prevPlayer2) => {
-          if (!prevPlayer2) return null;
-
-          return new Player(
-            prevPlayer2.x,
-            room.players[1].y,
-            prevPlayer2.width,
-            prevPlayer2.height,
-            prevPlayer2.color,
-            room.players[1].score
-          );
-        });
-
-        setBall((prevBall) => {
-          if (!prevBall) return null;
-
-          return new Ball(
-            room.ball.x,
-            room.ball.y,
-            prevBall.radius,
-            prevBall.color
-          );
-        });
-      });
-
-      socket.on("endGame", (room) => {
-        setGameStarted(false);
-        setMessage(
-          `${room.winner === playerNo ? "You are Winner!" : "You are Loser!"}`
+        return new Ball(
+          room.ball.x,
+          room.ball.y,
+          prevBall.radius,
+          prevBall.color
         );
-        socket.emit("leave", roomID);
-
-        setTimeout(() => {
-          const canvas = canvasRef.current as HTMLCanvasElement | null;
-          if (!canvas) return;
-
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
-
-          ctx.clearRect(0, 0, 800, 500);
-        }, 2000);
       });
+    });
 
-      //   Clean up on unmount
-      return () => {
-        console.log("disconnecting...");
-        socket.off("playerNo");
-        socket.off("startingGame");
-        socket.off("startedGame");
-        socket.off("updateGame");
-        socket.off("endGame");
-      };
-    }
+    //   Clean up on unmount
+    return () => {
+      console.log("disconnecting...");
+      socket.off("playerNo");
+      socket.off("startingGame");
+      socket.off("startedGame");
+      socket.off("updateGame");
+    };
   }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("endGame", (room) => {
+      setGameStarted(false);
+      console.log(room.winner, playerNo);
+      setMessage(
+        `${room.winner === playerNo ? "You are Winner!" : "You are Loser!"}`
+      );
+      socket.emit("leave", roomID);
+
+      setTimeout(() => {
+        const canvas = canvasRef.current as HTMLCanvasElement | null;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, 800, 500);
+      }, 2000);
+    });
+
+    return () => {
+      console.log("disconnecting...");
+      socket.off("endGame");
+    };
+  }, [socket, playerNo]);
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (isGameStarted && socket) {
