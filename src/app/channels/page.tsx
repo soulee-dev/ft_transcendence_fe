@@ -19,6 +19,15 @@ type UserData = {
   id: number;
 };
 
+type ChannelUsers = {
+  channel_id: number;
+  user_id: number;
+  admin: boolean;
+  id: number;
+  name: string;
+  status: string;
+};
+
 type ChannelData = {
   id: number;
   name: string;
@@ -80,6 +89,7 @@ export default function Channels() {
   const [privateModalIsOpen, setPrivateModalIsOpen] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
   const [privateChannelName, setPrivateChannelName] = useState<string>("");
+  const [channelUsers, setChannelUsers] = useState<ChannelUsers[]>([]);
 
   function openModal() {
     setModalIsOpen(true);
@@ -106,7 +116,6 @@ export default function Channels() {
     evnet: React.FormEvent<HTMLFormElement>
   ) => {
     evnet.preventDefault();
-    console.log(selectedChannel, joinPassword);
     axios
       .post(
         `${process.env.NEXT_PUBLIC_API_URL}/channels/join?name=${privateChannelName}&password=${joinPassword}`,
@@ -330,6 +339,58 @@ export default function Channels() {
       .catch((error) => {
         console.error(error);
       });
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
+        // Store the channel users' data from the response in a map for easy lookup
+        const channelUsersMap = new Map(
+          response.data.map((user: any) => [user.user_id, user])
+        );
+
+        // Generate promises to fetch user information
+        const fetchUserInfosPromises = response.data.map((userData: any) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${userData.user_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => {
+              const userInfo = userInfoResponse.data;
+              const isAdmin = (
+                channelUsersMap.get(userData.user_id) as { admin: boolean }
+              ).admin;
+              return {
+                ...userInfo,
+                admin: isAdmin, // Add the admin property here
+              };
+            })
+            .catch((error) => {
+              console.error(error);
+              toast.error(
+                (error.response?.data as { message: string })?.message
+              );
+            });
+        });
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((users) => {
+        setChannelUsers(users);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [selectedChannel]);
 
   const handleSelectChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -428,7 +489,6 @@ export default function Channels() {
   };
 
   const handleJoinPrivateSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log(privateChannelName);
     event.preventDefault();
     axios
       .post(
@@ -454,6 +514,7 @@ export default function Channels() {
       });
   };
 
+  console.log(channelUsers);
   return (
     <div>
       <ToastContainer />
@@ -548,6 +609,16 @@ export default function Channels() {
               <button value={channel.id} onClick={handleLeaveChannel}>
                 나가기
               </button>
+            </li>
+          ))}
+      </ul>
+      <h1>유저 목록</h1>
+      <ul>
+        {channelUsers &&
+          channelUsers.length > 0 &&
+          channelUsers.map((user) => (
+            <li key={user.id}>
+              [{user.status}] {user.name} {user.admin ? "(관리자)" : ""}
             </li>
           ))}
       </ul>
