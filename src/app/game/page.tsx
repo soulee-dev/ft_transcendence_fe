@@ -4,23 +4,31 @@ import "../../style/Game.css";
 import { useState, useEffect, useRef, useContext } from "react";
 import { SocketContext } from "../../contexts/SocketContext";
 import Player from "../../game/Player";
+import { useSearchParams } from "next/navigation";
 import Ball from "../../game/Ball";
+import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Game() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const socket = useContext(SocketContext);
   const [isGameStarted, setGameStarted] = useState(false);
   const [playerNo, setPlayerNo] = useState(0);
-  const [roomID, setRoomID] = useState(null);
+  const [roomId, setRoomID] = useState(0);
   const [message, setMessage] = useState("");
   const [player1, setPlayer1] = useState<Player | null>(null);
   const [player2, setPlayer2] = useState<Player | null>(null);
   const [ball, setBall] = useState<Ball | null>(null);
 
   const canvasRef = useRef(null);
+  const params = useSearchParams();
+
+  const userIdParam = params.get("userId");
+  const roomIdParam = params.get("roomId");
 
   useEffect(() => {
     if (!socket) return;
+
     socket.on("playerNo", (newPlayerNo: number) => {
       setPlayerNo(newPlayerNo);
     });
@@ -111,11 +119,49 @@ export default function Game() {
 
   useEffect(() => {
     if (!socket) return;
+
+    if (userIdParam) {
+      socket.emit("custom", userIdParam);
+      setGameStarted(true);
+      setIsButtonVisible(false);
+      setMessage("상대방을 기다리고 있습니다...");
+    }
+
+    if (roomIdParam) {
+      socket.emit("acceptInvite", roomIdParam);
+      setGameStarted(true);
+      setMessage("방장을 기다리고 있습니다...");
+    }
+
+    socket.on("roomId", (roomId) => {
+      console.log("roomId", parseInt(roomId));
+      setRoomID(roomId);
+    });
+
+    return () => {
+      socket.off("userIdParam");
+      socket.off("acceptInvite");
+      socket.off("invitedPlayerHasArrived");
+    };
+  }, [socket, userIdParam, roomIdParam]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("invitedPlayerHasArrived", () => {
+      console.log("상대방이 입장했습니다!");
+      toast.success("상대방이 입장했습니다!");
+      socket.emit("setCustom", roomId, "1");
+    });
+  }, [socket, roomIdParam, roomId]);
+
+  useEffect(() => {
+    if (!socket) return;
     socket.on("endGame", (room) => {
       setGameStarted(false);
       console.log(room.winner, playerNo);
       setMessage(`${room.winner === playerNo ? "이겼습니다!" : "졌습니다!"}`);
-      socket.emit("leave", roomID);
+      socket.emit("leave", roomId);
 
       setTimeout(() => {
         const canvas = canvasRef.current as HTMLCanvasElement | null;
@@ -139,14 +185,14 @@ export default function Game() {
       if (event.key === "ArrowUp") {
         // player move up
         socket.emit("move", {
-          roomID: roomID,
+          roomID: roomId,
           playerNo: playerNo,
           direction: "up",
         });
       } else if (event.key === "ArrowDown") {
         // player move down
         socket.emit("move", {
-          roomID: roomID,
+          roomID: roomId,
           playerNo: playerNo,
           direction: "down",
         });
@@ -208,10 +254,11 @@ export default function Game() {
       // Detach event listener on cleanup
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isGameStarted, playerNo, roomID]);
+  }, [isGameStarted, playerNo, roomId]);
 
   return (
     <div className="container">
+      <ToastContainer />
       <h1 id="heading">PING PONG</h1>
       <div className="game">
         <canvas id="canvas" ref={canvasRef} width="800" height="500"></canvas>

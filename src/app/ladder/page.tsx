@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
+import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 
 const LadderPage = () => {

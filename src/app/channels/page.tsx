@@ -199,10 +199,13 @@ export default function Channels() {
       socket.on("notification", (message: any) => {
         console.log(message);
         toast.success(message.message);
-        if (message.type == "PUBLIC_CHANNEL_CREATED") {
+        if (message.type === "PUBLIC_CHANNEL_CREATED") {
           fetchChannels();
         }
-        if (message.type == "SENT_MESSAGE") {
+        if (message.type === "INVITE_CUSTOM_GAME") {
+          window.location.href = `/game?roomId=${message.channelId}`;
+        }
+        if (message.type === "SENT_MESSAGE") {
           if (message.channelId == selectedChannel) {
             axios
               .get(
@@ -350,12 +353,10 @@ export default function Channels() {
         }
       )
       .then((response) => {
-        // Store the channel users' data from the response in a map for easy lookup
         const channelUsersMap = new Map(
           response.data.map((user: any) => [user.user_id, user])
         );
 
-        // Generate promises to fetch user information
         const fetchUserInfosPromises = response.data.map((userData: any) => {
           return axios
             .get(
@@ -373,7 +374,7 @@ export default function Channels() {
               ).admin;
               return {
                 ...userInfo,
-                admin: isAdmin, // Add the admin property here
+                admin: isAdmin,
               };
             })
             .catch((error) => {
@@ -621,6 +622,9 @@ export default function Channels() {
               <a href={`/profile/${user.name}`}>
                 [{user.status}] {user.name} {user.admin ? "(관리자)" : ""}{" "}
               </a>
+              <button>
+                <a href={`/game?userId=${user.id}`}>게임 초대</a>
+              </button>
             </li>
           ))}
       </ul>
