@@ -13,8 +13,15 @@ interface ProfileProps {
   };
 }
 
+interface LadderData {
+  userId: number;
+  winCount: number;
+  rank: number;
+}
+
 export default function Profile({ params }: ProfileProps) {
   const [profile, setProfile] = useState<any>(null);
+  const [ladderData, setLadderData] = useState<LadderData>({});
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
@@ -46,6 +53,27 @@ export default function Profile({ params }: ProfileProps) {
     };
   }, [profile]);
 
+  useEffect(() => {
+    if (!profile) return;
+
+    const access_token = Cookies.get("access_token");
+
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/games/ladder/${profile.id}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+      .then((response: AxiosResponse) => {
+        setLadderData(response.data);
+        console.log(response.data);
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  }, [profile]);
+
   return (
     <div>
       <ToastContainer />
@@ -60,6 +88,9 @@ export default function Profile({ params }: ProfileProps) {
           />
           <h2>이름: {profile.name}</h2>
           <h2>상태: {profile.status}</h2>
+          <h2>
+            등수: {ladderData.rank === 0 ? "순위권 외 입니다" : ladderData.rank}
+          </h2>
         </div>
       )}
     </div>
