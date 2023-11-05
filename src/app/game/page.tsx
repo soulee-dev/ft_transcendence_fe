@@ -45,7 +45,7 @@ export default function Game() {
       const p1 = new Player(
         room.players[0].x,
         room.players[0].y,
-        20,
+        10,
         60,
         "red",
         0
@@ -53,7 +53,7 @@ export default function Game() {
       const p2 = new Player(
         room.players[1].x,
         room.players[1].y,
-        20,
+        10,
         60,
         "blue",
         0
