@@ -618,7 +618,9 @@ export default function Channels() {
           channelUsers.length > 0 &&
           channelUsers.map((user) => (
             <li key={user.id}>
-              [{user.status}] {user.name} {user.admin ? "(관리자)" : ""}
+              <a href={`/profile/${user.name}`}>
+                [{user.status}] {user.name} {user.admin ? "(관리자)" : ""}{" "}
+              </a>
             </li>
           ))}
       </ul>
