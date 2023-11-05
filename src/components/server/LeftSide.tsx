@@ -64,6 +64,9 @@ function LeftSide() {
           <Link href="/friends">친구</Link>
         </li>
         <li>
+          <Link href="/ladder">랭킹</Link>
+        </li>
+        <li>
           <Link href="/block">차단</Link>
         </li>
         <li>
