@@ -21,7 +21,11 @@ interface LadderData {
 
 export default function Profile({ params }: ProfileProps) {
   const [profile, setProfile] = useState<any>(null);
-  const [ladderData, setLadderData] = useState<LadderData>({});
+  const [ladderData, setLadderData] = useState<LadderData>({
+    userId: 0,
+    winCount: 0,
+    rank: 0,
+  });
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
