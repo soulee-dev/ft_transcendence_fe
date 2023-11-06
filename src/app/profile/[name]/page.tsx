@@ -5,7 +5,6 @@ import { ToastContainer, toast } from "react-toastify";
 import { useState, useEffect, FormEvent } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { redirect } from "next/navigation";
 
 interface ProfileProps {
   params: {
@@ -78,6 +77,27 @@ export default function Profile({ params }: ProfileProps) {
       });
   }, [profile]);
 
+  const handleAddFriend = (name: string) => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/friends/add?name=${name}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response: AxiosResponse) => {
+        toast.success("친구 추가에 성공했습니다!");
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
+
   return (
     <div>
       <ToastContainer />
@@ -95,6 +115,9 @@ export default function Profile({ params }: ProfileProps) {
           <h2>
             등수: {ladderData.rank === 0 ? "순위권 외 입니다" : ladderData.rank}
           </h2>
+          <button onClick={() => handleAddFriend(profile.name)}>
+            친구 추가하기
+          </button>
         </div>
       )}
     </div>
