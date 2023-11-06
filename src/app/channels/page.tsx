@@ -23,6 +23,7 @@ type ChannelUsers = {
   channel_id: number;
   user_id: number;
   admin: boolean;
+  owner: boolean;
   id: number;
   name: string;
   status: string;
@@ -372,9 +373,13 @@ export default function Channels() {
               const isAdmin = (
                 channelUsersMap.get(userData.user_id) as { admin: boolean }
               ).admin;
+              const isOwner = (
+                channelUsersMap.get(userData.user_id) as { owner: boolean }
+              ).owner;
               return {
                 ...userInfo,
                 admin: isAdmin,
+                owner: isOwner,
               };
             })
             .catch((error) => {
@@ -620,7 +625,7 @@ export default function Channels() {
           channelUsers.map((user) => (
             <li key={user.id}>
               <a href={`/profile/${user.name}`}>
-                [{user.status}] {user.name} {user.admin ? "(관리자)" : ""}{" "}
+                [{user.status}] {user.name} {user.owner ? "(방장)" : user.admin ? "(관리자)" : ""}
               </a>
               <button>
                 <a href={`/game?userId=${user.id}`}>게임 초대</a>
