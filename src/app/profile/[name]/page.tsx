@@ -25,6 +25,7 @@ export default function Profile({ params }: ProfileProps) {
     winCount: 0,
     rank: 0,
   });
+  const [recordData, setRecordData] = useState<any>(null);
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
@@ -56,11 +57,8 @@ export default function Profile({ params }: ProfileProps) {
     };
   }, [profile]);
 
-  useEffect(() => {
-    if (!profile) return;
-
+  const fetchLadderData = () => {
     const access_token = Cookies.get("access_token");
-
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/games/ladder/${profile.id}`, {
         headers: {
@@ -75,6 +73,56 @@ export default function Profile({ params }: ProfileProps) {
         console.error(error);
         toast.error((error.response?.data as { message: string })?.message);
       });
+  };
+
+  const fetchRecordData = () => {
+    const access_token = Cookies.get("access_token");
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/games/user/${profile.id}/record`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
+        const records = response.data;
+        // Map records to promises to fetch user profiles
+        const userPromises = records.map((record: any) => {
+          return Promise.all([
+            axios.get(`http://localhost:3000/users/id/${record.player1_id}`, {
+              headers: { Authorization: `Bearer ${access_token}` },
+            }),
+            axios.get(`http://localhost:3000/users/id/${record.player2_id}`, {
+              headers: { Authorization: `Bearer ${access_token}` },
+            }),
+          ]).then(([player1Response, player2Response]) => {
+            return {
+              ...record,
+              player1: player1Response.data,
+              player2: player2Response.data,
+            };
+          });
+        });
+
+        return Promise.all(userPromises);
+      })
+      .then((recordsWithUsers) => {
+        setRecordData(recordsWithUsers);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(error.response?.data.message || "An error occurred");
+      });
+  };
+
+  useEffect(() => {
+    if (!profile) return;
+
+    fetchLadderData();
+    fetchRecordData();
   }, [profile]);
 
   const handleAddFriend = (name: string) => {
@@ -115,6 +163,28 @@ export default function Profile({ params }: ProfileProps) {
           <h2>
             등수: {ladderData.rank === 0 ? "순위권 외 입니다" : ladderData.rank}
           </h2>
+          <h2>전적 </h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recordData &&
+                recordData.length > 0 &&
+                recordData.map((record: any, index: number) => (
+                  <tr key={index}>
+                    <td>{record.player1.name}</td>
+                    <td>{record.player2.name}</td>
+                    <td>{`${record.score1}:${record.score2}`}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+
           <button onClick={() => handleAddFriend(profile.name)}>
             친구 추가하기
           </button>
