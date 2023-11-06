@@ -132,6 +132,7 @@ export default function Game() {
     if (roomIdParam) {
       socket.emit("acceptInvite", roomIdParam);
       setGameStarted(true);
+      setIsButtonVisible(false);
       setMessage("방장을 기다리고 있습니다...");
     }
 
@@ -163,7 +164,6 @@ export default function Game() {
     if (!socket) return;
     socket.on("endGame", (room) => {
       setGameStarted(false);
-      console.log(room.winner, playerNo);
       setMessage(`${room.winner === playerNo ? "이겼습니다!" : "졌습니다!"}`);
       socket.emit("leave", roomId);
 
