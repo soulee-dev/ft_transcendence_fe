@@ -16,6 +16,7 @@ export default function Friends() {
   type User = {
     id: number;
     name: string;
+    status: string;
   };
 
   type FriendRequest = {
@@ -257,7 +258,9 @@ export default function Friends() {
           friends.length > 0 &&
           friends.map((friend) => (
             <li key={friend.name}>
-              <span>{friend.name}</span>
+              <a href={`/profile/${friend.name}`}>
+                [{friend.status}] {friend.name}
+              </a>
               <button onClick={() => handleFriendDelete(friend.name)}>
                 삭제
               </button>
