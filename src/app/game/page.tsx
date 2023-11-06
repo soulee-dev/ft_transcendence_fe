@@ -31,6 +31,13 @@ export default function Game() {
   useEffect(() => {
     if (!socket) return;
 
+    socket.on("invitedPlayerHasArrived", () => {
+      toast.success("상대방이 입장했습니다!");
+      setIsCustomGameModalOpen(true);
+    });
+
+    // socket.on("거절 소켓")
+
     socket.on("playerNo", (newPlayerNo: number) => {
       setPlayerNo(newPlayerNo);
     });
@@ -112,6 +119,7 @@ export default function Game() {
     //   Clean up on unmount
     return () => {
       console.log("disconnecting...");
+      socket.off("invitedPlayerHasArrived");
       socket.off("playerNo");
       socket.off("startingGame");
       socket.off("startedGame");
@@ -148,23 +156,15 @@ export default function Game() {
 
   useEffect(() => {
     if (!socket) return;
-
-    socket.on("invitedPlayerHasArrived", () => {
-      console.log("상대방이 입장했습니다!");
-      toast.success("상대방이 입장했습니다!");
-      setIsCustomGameModalOpen(true);
-    });
-
-    return () => {
-      socket.off("invitedPlayerHasArrived");
-    };
-  }, [socket, roomIdParam, roomId]);
-
-  useEffect(() => {
-    if (!socket) return;
     socket.on("endGame", (room) => {
       setGameStarted(false);
-      setMessage(`${room.winner === playerNo ? "이겼습니다!" : "졌습니다!"}`);
+      setMessage(
+        `${
+          room.winner === playerNo
+            ? "이겼습니다! 3초 뒤 메인페이지로 돌아갑니다"
+            : "졌습니다! 3초 뒤 메인페이지로 돌아갑니다"
+        }`
+      );
       socket.emit("leave", roomId);
 
       setTimeout(() => {
@@ -176,6 +176,10 @@ export default function Game() {
 
         ctx.clearRect(0, 0, 800, 500);
       }, 2000);
+
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 3000);
     });
 
     return () => {
