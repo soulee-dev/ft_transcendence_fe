@@ -1,13 +1,14 @@
 "use client";
 
-import "../../style/Game.css";
+import "@/style/Game.css";
 import { useState, useEffect, useRef, useContext } from "react";
-import { SocketContext } from "../../contexts/SocketContext";
-import Player from "../../game/Player";
+import { SocketContext } from "@/contexts/SocketContext";
+import Player from "@/game/Player";
 import { useSearchParams } from "next/navigation";
-import Ball from "../../game/Ball";
+import Ball from "@/game/Ball";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
+import CustomGameModal from "@/components/CustomGameModal";
 
 export default function Game() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
@@ -19,6 +20,7 @@ export default function Game() {
   const [player1, setPlayer1] = useState<Player | null>(null);
   const [player2, setPlayer2] = useState<Player | null>(null);
   const [ball, setBall] = useState<Ball | null>(null);
+  const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
 
   const canvasRef = useRef(null);
   const params = useSearchParams();
@@ -151,7 +153,8 @@ export default function Game() {
     socket.on("invitedPlayerHasArrived", () => {
       console.log("상대방이 입장했습니다!");
       toast.success("상대방이 입장했습니다!");
-      socket.emit("setCustom", roomId, "1");
+
+      socket.emit("setCustom", roomId, 1);
     });
   }, [socket, roomIdParam, roomId]);
 
@@ -179,6 +182,13 @@ export default function Game() {
       socket.off("endGame");
     };
   }, [socket, playerNo]);
+
+  const onSubmitCustomGameSetting = (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    setIsCustomGameModalOpen(false);
+  };
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (isGameStarted && socket) {
@@ -247,11 +257,9 @@ export default function Game() {
   }, [player1, player2, ball]);
 
   useEffect(() => {
-    // Attach event listener for keydown
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      // Detach event listener on cleanup
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isGameStarted, playerNo, roomId]);
@@ -259,6 +267,14 @@ export default function Game() {
   return (
     <div className="container">
       <ToastContainer />
+      <CustomGameModal
+        isOpen={isCustomGameModalOpen}
+        onRequestClose={() => setIsCustomGameModalOpen(false)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          setIsCustomGameModalOpen(false);
+        }}
+      />
       <h1 id="heading">PING PONG</h1>
       <div className="game">
         <canvas id="canvas" ref={canvasRef} width="800" height="500"></canvas>

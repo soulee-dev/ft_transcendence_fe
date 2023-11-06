@@ -6,7 +6,7 @@ import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
-import Modal from "react-modal";
+import PasswordModal from "../../components/PasswordModal";
 
 type ChatData = {
   sent_by_id: number;
@@ -33,42 +33,6 @@ type ChannelData = {
   name: string;
 };
 
-interface PasswordModalProps {
-  isOpen: boolean;
-  onRequestClose: () => void;
-  joinPassword: string;
-  setJoinPassword: React.Dispatch<React.SetStateAction<string>>;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-}
-
-export const PasswordModal: React.FC<PasswordModalProps> = ({
-  isOpen,
-  onRequestClose,
-  joinPassword,
-  setJoinPassword,
-  onSubmit,
-}) => (
-  <Modal
-    isOpen={isOpen}
-    ariaHideApp={false}
-    onRequestClose={onRequestClose}
-    contentLabel="비밀번호 입력"
-  >
-    <h2>비밀번호를 입력해주세요</h2>
-    <form onSubmit={onSubmit}>
-      <input
-        name="joinPassword"
-        type="password"
-        placeholder="비밀번호"
-        value={joinPassword}
-        onChange={(e) => setJoinPassword(e.target.value)}
-      />
-      <button type="submit">입력</button>
-    </form>
-    <button onClick={onRequestClose}>닫기</button>
-  </Modal>
-);
-
 export default function Channels() {
   const [userData, setUserData] = useState({} as UserData);
   const [joinedChannels, setJoinedChannels] = useState<ChannelData[]>([]);
@@ -90,22 +54,6 @@ export default function Channels() {
   const [joinPassword, setJoinPassword] = useState("");
   const [privateChannelName, setPrivateChannelName] = useState<string>("");
   const [channelUsers, setChannelUsers] = useState<ChannelUsers[]>([]);
-
-  function openModal() {
-    setModalIsOpen(true);
-  }
-
-  function closeModal() {
-    setModalIsOpen(false);
-  }
-
-  function openPrivateModal() {
-    setPrivateModalIsOpen(true);
-  }
-
-  function closePrivateModal() {
-    setPrivateModalIsOpen(false);
-  }
 
   const fetchChannels = () => {
     fetchJoinedChannels();
@@ -129,7 +77,7 @@ export default function Channels() {
       .then((response) => {
         toast.success("채널에 참여했습니다.");
         fetchChannels();
-        closePrivateModal();
+        setPrivateModalIsOpen(false);
       })
       .catch((error) => {
         console.log(error);
@@ -152,7 +100,7 @@ export default function Channels() {
       .then((response) => {
         toast.success("채널에 참여했습니다.");
         fetchChannels();
-        closeModal();
+        setModalIsOpen(false);
       })
       .catch((error) => {
         console.error(error);
@@ -461,7 +409,7 @@ export default function Channels() {
         console.error(error);
         if (error.response?.status == 401) {
           setSelectedChannel(parseInt(channelId));
-          openModal();
+          setModalIsOpen(true);
         } else {
           toast.error((error.response?.data as { message: string })?.message);
         }
@@ -508,27 +456,26 @@ export default function Channels() {
       .catch((error) => {
         console.error(error);
         if (error.response?.status == 401) {
-          openPrivateModal();
+          setPrivateModalIsOpen(true);
         } else {
           toast.error((error.response?.data as { message: string })?.message);
         }
       });
   };
 
-  console.log(channelUsers);
   return (
     <div>
       <ToastContainer />
       <PasswordModal
         isOpen={modalIsOpen}
-        onRequestClose={closeModal}
+        onRequestClose={() => setModalIsOpen(false)}
         joinPassword={joinPassword}
         setJoinPassword={setJoinPassword}
         onSubmit={handlePasswordSubmit}
       />
       <PasswordModal
         isOpen={privateModalIsOpen}
-        onRequestClose={closePrivateModal}
+        onRequestClose={() => setPrivateModalIsOpen(false)}
         joinPassword={joinPassword}
         setJoinPassword={setJoinPassword}
         onSubmit={handlePrivatePasswordSubmit}

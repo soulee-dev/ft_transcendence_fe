@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useState, useEffect, FormEvent } from "react";
@@ -25,6 +26,9 @@ export default function EditProfile() {
     profile_image: "",
   });
 
+  const params = useSearchParams();
+  const newUserParam = params.get("newUser");
+
   const fetchUser = () => {
     const access_token = Cookies.get("access_token");
 
@@ -46,6 +50,18 @@ export default function EditProfile() {
         console.error(error);
       });
   };
+
+  useEffect(() => {
+    if (newUserParam === "true") {
+      toast.success(
+        <>
+          회원가입에 성공했습니다.
+          <br />
+          프로필을 꾸며보세요!
+        </>
+      );
+    }
+  }, [newUserParam]);
 
   useEffect(() => fetchUser(), []);
 
