@@ -141,9 +141,7 @@ export default function Game() {
     });
 
     return () => {
-      socket.off("userIdParam");
-      socket.off("acceptInvite");
-      socket.off("invitedPlayerHasArrived");
+      socket.off("roomId");
     };
   }, [socket, userIdParam, roomIdParam]);
 
@@ -153,9 +151,12 @@ export default function Game() {
     socket.on("invitedPlayerHasArrived", () => {
       console.log("상대방이 입장했습니다!");
       toast.success("상대방이 입장했습니다!");
-
-      socket.emit("setCustom", roomId, 1);
+      setIsCustomGameModalOpen(true);
     });
+
+    return () => {
+      socket.off("invitedPlayerHasArrived");
+    };
   }, [socket, roomIdParam, roomId]);
 
   useEffect(() => {
@@ -188,6 +189,13 @@ export default function Game() {
   ) => {
     event.preventDefault();
     setIsCustomGameModalOpen(false);
+    console.log(event.target);
+    const speed = event.currentTarget.speed.value;
+
+    if (socket && socket.connected) {
+      socket.emit("setCustom", roomId, speed);
+      console.log(`setCustom ${roomId} ${speed}`);
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -270,10 +278,7 @@ export default function Game() {
       <CustomGameModal
         isOpen={isCustomGameModalOpen}
         onRequestClose={() => setIsCustomGameModalOpen(false)}
-        onSubmit={(event) => {
-          event.preventDefault();
-          setIsCustomGameModalOpen(false);
-        }}
+        onSubmit={onSubmitCustomGameSetting}
       />
       <h1 id="heading">PING PONG</h1>
       <div className="game">

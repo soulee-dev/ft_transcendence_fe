@@ -7,19 +7,20 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
 import PasswordModal from "../../components/PasswordModal";
+import InviteModal from "@/components/InviteModal";
 
-type ChatData = {
+interface ChatData {
   sent_by_id: number;
   id: number;
   message: string;
-};
+}
 
-type UserData = {
+interface UserData {
   name: string;
   id: number;
-};
+}
 
-type ChannelUsers = {
+interface ChannelUsers {
   channel_id: number;
   user_id: number;
   admin: boolean;
@@ -27,12 +28,12 @@ type ChannelUsers = {
   id: number;
   name: string;
   status: string;
-};
+}
 
-type ChannelData = {
+interface ChannelData {
   id: number;
   name: string;
-};
+}
 
 export default function Channels() {
   const [userData, setUserData] = useState({} as UserData);
@@ -55,6 +56,9 @@ export default function Channels() {
   const [joinPassword, setJoinPassword] = useState("");
   const [privateChannelName, setPrivateChannelName] = useState<string>("");
   const [channelUsers, setChannelUsers] = useState<ChannelUsers[]>([]);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteData, setInviteData] = useState({} as any);
+  const [inviteeUserName, setInviteeUserName] = useState("");
 
   const fetchChannels = () => {
     fetchJoinedChannels();
@@ -152,7 +156,28 @@ export default function Channels() {
           fetchChannels();
         }
         if (message.type === "INVITE_CUSTOM_GAME") {
-          window.location.href = `/game?roomId=${message.channelId}`;
+          setInviteData(message);
+          const access_token = Cookies.get("access_token");
+
+          axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((response) => {
+              setInviteeUserName(response.data.name);
+            })
+            .catch((error) => {
+              console.error(error);
+              toast.error(
+                (error.response?.data as { message: string })?.message
+              );
+            });
+          setIsInviteModalOpen(true);
         }
         if (message.type === "SENT_MESSAGE") {
           if (message.channelId == selectedChannel) {
@@ -468,9 +493,34 @@ export default function Channels() {
       });
   };
 
+  const handleAcceptInvite = () => {
+    toast.success(
+      <>
+        초대를 수락했습니다.
+        <br />곧 게임을 시작합니다.
+      </>
+    );
+    // redirect after 3 sconds
+    window.location.href = `/game?roomId=${inviteData.channelId}`;
+  };
+
+  const handleRejectInvite = () => {
+    if (!socket) return;
+    socket.emit("declineInvite", inviteData.channelId);
+    toast.success("초대를 거절했습니다.");
+    setIsInviteModalOpen(false);
+  };
+
   return (
     <div>
       <ToastContainer />
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onReuqestClose={() => setIsInviteModalOpen(false)}
+        handleAcceptInvite={handleAcceptInvite}
+        handleRejectInvite={handleRejectInvite}
+        inviteeUserName={inviteeUserName}
+      />
       <PasswordModal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
@@ -572,7 +622,8 @@ export default function Channels() {
           channelUsers.map((user) => (
             <li key={user.id}>
               <a href={`/profile/${user.name}`}>
-                [{user.status}] {user.name} {user.owner ? "(방장)" : user.admin ? "(관리자)" : ""}
+                [{user.status}] {user.name}{" "}
+                {user.owner ? "(방장)" : user.admin ? "(관리자)" : ""}
               </a>
               <button>
                 <a href={`/game?userId=${user.id}`}>게임 초대</a>
