@@ -79,6 +79,7 @@ export default function Game() {
     });
 
     socket.on("updateGame", (room) => {
+      console.log(room);
       setPlayer1((prevPlayer1) => {
         if (!prevPlayer1) return null;
 
@@ -149,7 +150,13 @@ export default function Game() {
       socket.emit("joinAsSpectator", spectateUserId);
       setGameStarted(true);
       setIsButtonVisible(false);
-      setMessage("게임을 기다리고 있습니다...");
+      const p1 = new Player(90, 200, 10, 60, "red", 0);
+      const p2 = new Player(690, 200, 10, 60, "blue", 0);
+      const newBall = new Ball(395, 245, 10, "white");
+
+      setPlayer1(p1);
+      setPlayer2(p2);
+      setBall(newBall);
     }
 
     socket.on("roomId", (roomId) => {
