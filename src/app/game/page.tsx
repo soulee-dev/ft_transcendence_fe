@@ -27,6 +27,7 @@ export default function Game() {
 
   const userIdParam = params.get("userId");
   const roomIdParam = params.get("roomId");
+  const spectateUserId = params.get("spectateUserId");
 
   useEffect(() => {
     if (!socket) return;
@@ -144,6 +145,13 @@ export default function Game() {
       setMessage("방장을 기다리고 있습니다...");
     }
 
+    if (spectateUserId) {
+      socket.emit("joinAsSpectator", spectateUserId);
+      setGameStarted(true);
+      setIsButtonVisible(false);
+      setMessage("게임을 기다리고 있습니다...");
+    }
+
     socket.on("roomId", (roomId) => {
       console.log("roomId", parseInt(roomId));
       setRoomID(roomId);
@@ -152,7 +160,7 @@ export default function Game() {
     return () => {
       socket.off("roomId");
     };
-  }, [socket, userIdParam, roomIdParam]);
+  }, [socket, userIdParam, roomIdParam, spectateUserId]);
 
   useEffect(() => {
     if (!socket) return;
