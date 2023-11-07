@@ -11,7 +11,7 @@ export default function ProfileNoParam() {
   };
 
   return (
-    <div>
+    <div className="main">
       <h1>프로필 검색</h1>
       <form onSubmit={handleSubmit}>
         <label>사용자 이름</label>

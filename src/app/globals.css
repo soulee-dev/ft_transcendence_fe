@@ -41,6 +41,13 @@
   --card-border-rgb: 131, 134, 135;
 }
 
+@font-face {
+  font-family: 'Cassiopeia'; /* 원하는 폰트 이름 설정 */
+  src: url('src/font/Aacassiopeia.ttf') format('truetype'); /* 폰트 파일 경로 설정 */
+  font-weight: normal; /* 폰트 두께 설정 */
+  font-style: normal; /* 폰트 스타일 설정 */
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
@@ -91,6 +98,9 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* font-family: 'Cassiopeia', sans-serif; */
+  align-items: center;
+  justify-content: center;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -563,4 +573,18 @@ body {
 
 canvas {
   position: absolute;
+}
+
+.loginPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;  
+  width: 1024px;
+  height: 768px;
+  /* min-width: 100px; */
+  min-height: 768px;
+  border: 1px solid white;
+  margin: auto;
+  flex-direction: column;
+  overflow: hidden;
 }

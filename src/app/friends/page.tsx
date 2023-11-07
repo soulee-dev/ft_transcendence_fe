@@ -250,7 +250,7 @@ export default function Friends() {
   }, []);
 
   return (
-    <div>
+    <div className="main">
       <ToastContainer />
       <h1>친구 목록</h1>
       <ul>
