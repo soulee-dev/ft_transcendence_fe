@@ -248,6 +248,7 @@ export default function Channels() {
       .then((response) => {
         toast.success("채널이 생성되었습니다.");
         fetchChannels();
+        setUserList([]);
       })
       .catch((error) => {
         console.error("채팅방 생성 중 오류 발생:", error);
