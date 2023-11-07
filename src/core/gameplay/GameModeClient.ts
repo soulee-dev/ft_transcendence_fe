@@ -4,26 +4,25 @@ import Ball from "../../game/objects/Ball";
 import Paddle from "../../game/objects/Paddle";
 import socketIOClient, { Socket } from "socket.io-client";
 
+
 class GameModeClient {
 	private _engine: Engine;
 	private _playerArray: Player[];
 	private _tempPlayer: Player;
 	private _lastPressedKey: string;
-	private _socket: Socket;
 
-	constructor(engine: Engine, socket: Socket) {
+	constructor(engine: Engine) {
 		this._engine = engine;
 		this._playerArray = [];
 		this._lastPressedKey = "";
 
 		this._tempPlayer = new Player();
-		this._socket = socket;
-		this._socket.on("ball", (data: Ball) => {
-			this.onBallChange(data);
-		});
-		this._socket.on("move", (data) => {
-			this.onPaddleChange(data);
-		});
+		// socket.on("ball", (data: Ball) => {
+		// 	this.onBallChange(data);
+		// });
+		// socket.on("move", (data) => {
+		// 	this.onPaddleChange(data);
+		// });
 		window.addEventListener("keydown", this.handleKeyDown);
 		window.addEventListener("keyup", this.handleKeyUp);
 	}
@@ -48,7 +47,7 @@ class GameModeClient {
 			8,
 			0,
 			0.1,
-			"white"
+			"red"
 		);
 
 		const myPaddle = new Paddle(
@@ -89,12 +88,12 @@ class GameModeClient {
 		switch (event.key) {
 			case "ArrowLeft":
 				console.log("client press key : left");
-				this._socket.emit("input", -0.25);
+				// socket.emit("input", -0.25);
 				this._tempPlayer._pawn!.dx = -0.25;
 				break;
 			case "ArrowRight":
 				console.log("client presse key : right");
-				this._socket.emit("input", 0.25);
+				// socket.emit("input", 0.25);
 				this._tempPlayer._pawn!.dx = 0.25;
 				break;
 			default:
@@ -105,7 +104,7 @@ class GameModeClient {
 	handleKeyUp = (event: KeyboardEvent) => {
 		console.log("Released key : " + event.key);
 		if (this._lastPressedKey === event.key) {
-			this._socket.emit("input", 0);
+			// socket.emit("input", 0);
 
 			this._tempPlayer._pawn!.dx = 0;
 		}

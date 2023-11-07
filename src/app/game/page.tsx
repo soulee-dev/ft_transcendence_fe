@@ -37,15 +37,16 @@ export default function GamePage() {
 	const [start, setStart] = useState<boolean>(false);
 
 	function handleConnection() {
-		socket = socketIOClient();
-		socket.on("start", () => {
-			console.log("start event received");
-			setStart(true);
-		});
+		// socket = socketIOClient();
+		// socket.on("start", () => {
+		// 	console.log("start event received");
+		// 	setStart(true);
+		// });
+		setStart(true);
 	}
 
 	if (start) {
-		return <Game socket={socket} />;
+		return <Game />;
 	} else {
 		return (
 			<SelectGameMode
