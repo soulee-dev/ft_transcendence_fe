@@ -8,20 +8,20 @@ import axios from "axios";
 import { useEffect } from "react";
 
 export default function ChannelAdmin() {
-  const [selectedChannelData, setSelectedChannelData] = useState<any>({});
   const [adminChannels, setAdminChannels] = useState<any>([]);
   const [selectedChannel, setSelectedChannel] = useState(0);
   const [selectedChannelUsers, setSelectedChannelUsers] = useState<any>([]);
   const [channelName, setChannelName] = useState("");
   const [channelPassword, setChannelPassword] = useState("");
-  const selectOption = ["PUBLIC", "PRIVATE"];
-  const [selectedChannelType, setSelectedChannelType] = useState(
-    selectOption[0]
-  );
   const [mutedUsers, setMutedUsers] = useState<any>([]);
   const [banList, setBanList] = useState<any>([]);
+  const [hasPassword, setHasPassword] = useState(false);
 
   useEffect(() => {
+    fetchChnnelInfo();
+  }, []);
+
+  const fetchChnnelInfo = () => {
     const access_token = Cookies.get("access_token");
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/adminChannelList`, {
@@ -36,7 +36,7 @@ export default function ChannelAdmin() {
         toast.error((error.response?.data as { message: string })?.message);
         console.error(error);
       });
-  }, []);
+  };
 
   const fetchChannelUsers = (channelId: number) => {
     const access_token = Cookies.get("access_token");
@@ -112,14 +112,8 @@ export default function ChannelAdmin() {
       });
   };
 
-  // const fetchChannelData = (channelId: number) => {
-  //   const access_token = Cookies.get("access_token");
-  //   axios.
-  // }
-
   useEffect(() => {
     if (selectedChannel) {
-      // fetchChannelData(selectedChannel);
       fetchChannelUsers(selectedChannel);
       fetchMutedUsers(selectedChannel);
       fetchBanUsers(selectedChannel);
@@ -144,6 +138,8 @@ export default function ChannelAdmin() {
       .then(() => {
         toast.success("성공적으로 처리되었습니다.");
         fetchChannelUsers(selectedChannel);
+        fetchMutedUsers(selectedChannel);
+        fetchBanUsers(selectedChannel);
       })
       .catch((error) => {
         toast.error((error.response?.data as { message: string })?.message);
@@ -153,28 +149,32 @@ export default function ChannelAdmin() {
 
   const handleUpdateChannel = () => {
     const access_token = Cookies.get("access_token");
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/update`,
-        {
-          name: channelName,
-          password: channelPassword,
-          option: selectedChannelType,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
-      .then(() => {
-        toast.success("성공적으로 처리되었습니다.");
-        fetchChannelUsers(selectedChannel);
-      })
-      .catch((error) => {
-        toast.error((error.response?.data as { message: string })?.message);
-        console.error(error);
-      });
+    let requestData: any = {};
+    if (channelName !== "") requestData.name = channelName;
+    if (channelPassword !== "") requestData.password = channelPassword;
+    if (!hasPassword) requestData.password = "";
+
+    if (Object.keys(requestData).length > 0) {
+      axios
+        .post(
+          `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/update`,
+          requestData,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        )
+        .then(() => {
+          toast.success("성공적으로 처리되었습니다.");
+        })
+        .catch((error) => {
+          toast.error((error.response?.data as { message: string })?.message);
+          console.error(error);
+        });
+    } else {
+      toast.error("수정할 데이터를 입력해주세요.");
+    }
   };
 
   return (
@@ -201,24 +201,23 @@ export default function ChannelAdmin() {
             onChange={(e) => setChannelName(e.target.value)}
           />
           <br />
+          비밀번호 여부
           <input
-            name="password"
-            type="password"
-            placeholder="비밀번호"
-            value={channelPassword}
-            onChange={(e) => setChannelPassword(e.target.value)}
+            name="isPassword"
+            type="checkbox"
+            checked={hasPassword}
+            onChange={(e) => setHasPassword(e.target.checked)}
           />
           <br />
-          <select
-            onChange={(e) => setSelectedChannelType(e.target.value)}
-            value={selectedChannelType}
-          >
-            {selectOption.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+          {hasPassword && (
+            <input
+              name="password"
+              type="password"
+              placeholder="비밀번호"
+              value={channelPassword}
+              onChange={(e) => setChannelPassword(e.target.value)}
+            />
+          )}
           <br />
           <button onClick={handleUpdateChannel}>저장</button>
         </div>
