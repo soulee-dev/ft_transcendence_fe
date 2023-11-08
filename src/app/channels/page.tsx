@@ -68,6 +68,63 @@ export default function Channels() {
 
   const router = useRouter();
 
+  const fetchChannelUsers = () => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
+        const channelUsersMap = new Map(
+          response.data.map((user: any) => [user.user_id, user])
+        );
+
+        const fetchUserInfosPromises = response.data.map((userData: any) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${userData.user_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => {
+              const userInfo = userInfoResponse.data;
+              const isAdmin = (
+                channelUsersMap.get(userData.user_id) as { admin: boolean }
+              ).admin;
+              const isOwner = (
+                channelUsersMap.get(userData.user_id) as { owner: boolean }
+              ).owner;
+              return {
+                ...userInfo,
+                admin: isAdmin,
+                owner: isOwner,
+              };
+            })
+            .catch((error) => {
+              console.error(error);
+              toast.error(
+                (error.response?.data as { message: string })?.message
+              );
+            });
+        });
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((users) => {
+        setChannelUsers(users);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const fetchChannels = () => {
     fetchJoinedChannels();
     fetchPublicChannels();
@@ -156,8 +213,16 @@ export default function Channels() {
 
   useEffect(() => {
     const handleNotification = (message: any) => {
-      if (message.type === "PUBLIC_CHANNEL_CREATED") {
+      if (
+        message.type === "PUBLIC_CHANNEL_CREATED" ||
+        message.type == "KICKED" ||
+        message.type == "BANNED"
+      ) {
         fetchChannels();
+      }
+
+      if (message.type == "GIVEN_ADMIN") {
+        fetchChannelUsers();
       }
       if (message.type === "INVITE_CUSTOM_GAME") {
         setInviteData(message);
@@ -322,59 +387,7 @@ export default function Channels() {
         console.error(error);
       });
 
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
-      .then((response) => {
-        const channelUsersMap = new Map(
-          response.data.map((user: any) => [user.user_id, user])
-        );
-
-        const fetchUserInfosPromises = response.data.map((userData: any) => {
-          return axios
-            .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${userData.user_id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${access_token}`,
-                },
-              }
-            )
-            .then((userInfoResponse) => {
-              const userInfo = userInfoResponse.data;
-              const isAdmin = (
-                channelUsersMap.get(userData.user_id) as { admin: boolean }
-              ).admin;
-              const isOwner = (
-                channelUsersMap.get(userData.user_id) as { owner: boolean }
-              ).owner;
-              return {
-                ...userInfo,
-                admin: isAdmin,
-                owner: isOwner,
-              };
-            })
-            .catch((error) => {
-              console.error(error);
-              toast.error(
-                (error.response?.data as { message: string })?.message
-              );
-            });
-        });
-        return Promise.all(fetchUserInfosPromises);
-      })
-      .then((users) => {
-        setChannelUsers(users);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    fetchChannelUsers();
   }, [selectedChannel]);
 
   const handleSelectChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
