@@ -102,29 +102,27 @@ export default function Friends() {
   };
 
   useEffect(() => {
-    if (socket) {
-      console.log("socket on");
-      socket.on("notification", (message: any) => {
-        console.log(message);
-        toast.success(message.message);
-        if (
-          message.type == "REQUESTED_FRIEND" ||
-          message.type == "DELETED_FRIEND" ||
-          message.type == "ACCEPTED_YOUR_REQ" ||
-          message.type == "DECLINED_YOUR_REQ" ||
-          message.type == "ADDED_TO_CHANNEL"
-        ) {
-          fetchFriends();
-          fetchFriendRequests();
-        }
-      });
-    }
+    if (!socket) return;
+
+    console.log("socket on");
+    socket.on("notification", (message: any) => {
+      console.log(message);
+      toast.success(message.message);
+      if (
+        message.type == "REQUESTED_FRIEND" ||
+        message.type == "DELETED_FRIEND" ||
+        message.type == "ACCEPTED_YOUR_REQ" ||
+        message.type == "DECLINED_YOUR_REQ" ||
+        message.type == "ADDED_TO_CHANNEL"
+      ) {
+        fetchFriends();
+        fetchFriendRequests();
+      }
+    });
 
     return () => {
-      if (socket) {
-        console.log("socket off");
-        socket.off("notification");
-      }
+      console.log("socket off");
+      socket.off("notification");
     };
   }, [socket]);
 
