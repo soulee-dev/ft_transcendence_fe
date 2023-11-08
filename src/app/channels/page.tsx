@@ -644,7 +644,7 @@ export default function Channels() {
                 [{user.status}] {user.name}{" "}
                 {user.owner ? "(방장)" : user.admin ? "(관리자)" : ""}
               </a>
-              {userData.id !== user.id && (
+              {userData.id !== user.id && user.status != "in_game" && (
                 <button>
                   <a href={`/game?userId=${user.id}`}>게임 초대</a>
                 </button>

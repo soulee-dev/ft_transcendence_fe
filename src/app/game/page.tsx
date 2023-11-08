@@ -229,6 +229,7 @@ export default function Game() {
     return () => {
       socket.off("declinedInvite");
       socket.emit("cancelMatch", roomId);
+      socket.emit("leaveAsSpectator", roomId);
     };
   }, [socket, roomId]);
 
@@ -239,7 +240,7 @@ export default function Game() {
       e.preventDefault();
       console.log("disconnecting from game...");
       if (isSpectate) {
-        socket.emit("leaveAsSpectator");
+        socket.emit("leaveAsSpectator", roomId);
       } else {
         socket.emit("cancelMatch", roomId);
       }

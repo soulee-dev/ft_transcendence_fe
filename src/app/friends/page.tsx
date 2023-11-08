@@ -262,9 +262,11 @@ export default function Friends() {
               <button onClick={() => handleCreateDM(friend.id)}>
                 채팅 만들기
               </button>
-              <button>
-                <a href={`/game?userId=${friend.id}`}>게임 초대</a>
-              </button>
+              {friend.status != "in_game" && (
+                <button>
+                  <a href={`/game?userId=${friend.id}`}>게임 초대</a>
+                </button>
+              )}
               {friend.status == "in_game" && (
                 <button>
                   <a href={`/game?spectateUserId=${friend.id}`}>게임 관전</a>
