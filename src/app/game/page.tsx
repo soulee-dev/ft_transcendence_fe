@@ -21,6 +21,7 @@ export default function Game() {
   const [player2, setPlayer2] = useState<Player | null>(null);
   const [ball, setBall] = useState<Ball | null>(null);
   const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
+  const [isSpectate, setIsSpectate] = useState(false);
 
   const canvasRef = useRef(null);
   const params = useSearchParams();
@@ -79,7 +80,6 @@ export default function Game() {
     });
 
     socket.on("updateGame", (room) => {
-      console.log(room);
       setPlayer1((prevPlayer1) => {
         if (!prevPlayer1) return null;
 
@@ -147,6 +147,7 @@ export default function Game() {
     }
 
     if (spectateUserId) {
+      setIsSpectate(true);
       socket.emit("joinAsSpectator", spectateUserId);
       setGameStarted(true);
       setIsButtonVisible(false);
@@ -180,7 +181,11 @@ export default function Game() {
             : "졌습니다! 3초 뒤 메인페이지로 돌아갑니다"
         }`
       );
-      socket.emit("leave", roomId);
+      if (isSpectate) {
+        socket.emit("leaveAsSpectator", roomId);
+      } else {
+        socket.emit("leave", roomId);
+      }
 
       setTimeout(() => {
         const canvas = canvasRef.current as HTMLCanvasElement | null;
@@ -201,7 +206,26 @@ export default function Game() {
       console.log("disconnecting...");
       socket.off("endGame");
     };
-  }, [socket, playerNo]);
+  }, [socket, playerNo, isSpectate]);
+
+  useEffect(() => {
+    console.log("loaded...");
+    if (!socket) return;
+    const handleUnload = (e: any) => {
+      e.preventDefault();
+      console.log("disconnecting from game...");
+      if (isSpectate) {
+        socket.emit("leaveAsSpectator");
+      } else {
+        socket.emit("cancelMatch", roomId);
+      }
+    };
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, [socket, isSpectate, roomId]);
 
   const onSubmitCustomGameSetting = (
     event: React.FormEvent<HTMLFormElement>
