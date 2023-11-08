@@ -1,3 +1,8 @@
+* {
+  font-family: 'Cassiopeia';
+  color: white;
+}
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -43,7 +48,7 @@
 
 @font-face {
   font-family: 'Cassiopeia'; /* 원하는 폰트 이름 설정 */
-  src: url('src/font/Aacassiopeia.ttf') format('truetype'); /* 폰트 파일 경로 설정 */
+  src: url('../font/AaCassiopeia.ttf') format('truetype'); /* 폰트 파일 경로 설정 */
   font-weight: normal; /* 폰트 두께 설정 */
   font-style: normal; /* 폰트 스타일 설정 */
 }
@@ -98,9 +103,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* font-family: 'Cassiopeia', sans-serif; */
-  align-items: center;
-  justify-content: center;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -123,8 +125,10 @@ body {
 .main {
   flex: 1;
   display: flex;
-  flex-direction: row;
   background-color: black;
+  align-items: center;
+  justify-content: center;
+  height: 726px;
 }
 
 .friendList,
@@ -162,21 +166,6 @@ body {
 .frinedAndChatNav {
   width: 240px;
   flex-direction: row;
-}
-.div9 {
-  border-radius: var(--br-13xl);
-  background-color: var(--color-white);
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.div8 {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: var(--padding-9xs);
 }
 .frinedNickname {
   position: relative;
@@ -267,7 +256,7 @@ body {
   color: #5498ef;
 }
 .rightSide {
-  border: 1px solid white;
+  /* border: 1px solid white; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -303,12 +292,15 @@ body {
   justify-content: flex-start;
   gap: var(--gap-3xs);
 }
+
 .leftSide {
   border: 1px solid white;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 260px;
+  height: 726px;
+  font-size: 24px;
 }
 .image-5-icon {
   position: relative;
@@ -373,19 +365,7 @@ body {
   cursor: pointer;
 }
 
-.center {
-  flex:1;
-  /* width: 1500px; */
-  border: 1px solid white;
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* width: 502px; */
-  /* TODO: 원래 픽셀 503 */
-  /* height: 727px; */
-  /* overflow: hidden; */
-}
+
 .div130 {
   top: 44px;
   left: 1015px;
@@ -587,4 +567,152 @@ canvas {
   margin: auto;
   flex-direction: column;
   overflow: hidden;
+}
+
+.center {
+  /* flex:1; */
+  /* width: 1500px; */
+  /* width: 502px; */
+  /* TODO: 원래 픽셀 503 */
+  /* height: 727px; */
+  
+  flex: 1;
+  border: 1px solid white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 500px;
+  height: 727px;
+  overflow-y: scroll;
+}
+
+.chatting {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px solid white; */
+  overflow-y: scroll;
+}
+
+.makeChattingRoom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #4a4a4a;
+  width: 5px;
+  height: 253px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* justify-content: center; */
+  flex: 1;
+  padding-bottom: 20px;
+  width : 140px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.find-profile {
+  display: flex;
+  flex-direction: column; /* 컨테이너를 세로로 나열 */
+  background-color: black;
+  align-items: center;
+  height: 726px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.div9 {
+  border-radius: var(--br-13xl);
+  background-color: var(--color-white);
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.div8 {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--padding-9xs);
+}
+
+.friend-menu-container {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* justify-content: center; */
+  flex: 1;
+  padding-bottom: 20px;
+  width : 420px;
+  overflow-y: scroll; 
+}
+
+/* GAME */
+
+.container {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 500px;
+  background-color: black;
+	/* height: 72 7px; */
+}
+
+.game{
+	position: relative;
+  flex: 1;
+	display: flex;
+	width: 500px;
+  height: 727px;
+}
+
+#heading {
+	text-align: center;
+	font-size: 48px;
+}
+
+#canvas {
+	margin-top: 10px;
+	background-color: black;
+}
+
+#message {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	color: white;
+	transform: translate(-50%, -50%);
+	font-size: 12px;
+}
+
+#startBtn {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	font-size: 20px;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 10px 20px;
+	color: black;
+}
+
+#startBtn:hover {
+	filter: brightness(0.8);
 }

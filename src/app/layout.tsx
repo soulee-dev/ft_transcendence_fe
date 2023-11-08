@@ -1,6 +1,6 @@
 "use client";
 
-// import "./globals.css";
+import "./globals.css";
 import { Inter } from "next/font/google";
 import LeftSide from "../components/server/LeftSide";
 import RightSide from "../components/server/RightSide";
@@ -99,8 +99,7 @@ export default function RootLayout({
             <RightSide />
           </div>
         </SocketProvider>
-        </body>
-                ) : (
+        </body> ) : (
                   <body
                     style={{
                       display: "flex",

@@ -180,6 +180,7 @@ export default function ChannelAdmin() {
   return (
     <div>
       <ToastContainer />
+      <h1>채팅방 관리ㅋㅋ</h1>
       <ul>
         {adminChannels.map((channel: any) => (
           <li key={channel.id}>

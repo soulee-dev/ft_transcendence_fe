@@ -11,17 +11,18 @@ export default function ProfileNoParam() {
   };
 
   return (
-    <div className="main">
+    <div className="find-profile">
       <h1>프로필 검색</h1>
-      <form onSubmit={handleSubmit}>
-        <label>사용자 이름</label>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <button type="submit">검색</button>
+      <form onSubmit={handleSubmit} className="form-container">
+          <label htmlFor="username">사용자 이름</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+       <button type="submit">검색</button>
       </form>
     </div>
   );

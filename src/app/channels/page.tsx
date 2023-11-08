@@ -513,7 +513,7 @@ export default function Channels() {
   };
 
   return (
-    <div>
+    <div className="chatting">
       <ToastContainer />
       <InviteModal
         isOpen={isInviteModalOpen}
@@ -536,7 +536,6 @@ export default function Channels() {
         setJoinPassword={setJoinPassword}
         onSubmit={handlePrivatePasswordSubmit}
       />
-      <div>
         <h1>채팅방 생성하기</h1>
         <input
           name="name"
@@ -576,7 +575,7 @@ export default function Channels() {
           ))}
         </ul>
         <button onClick={() => handleCreateChannel()}>채팅방 만들기</button>
-      </div>
+      
       <h1>비공개 채팅방 들어가기</h1>
       <form onSubmit={handleJoinPrivateSubmit}>
         <input

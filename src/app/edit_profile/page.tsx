@@ -136,7 +136,6 @@ export default function EditProfile() {
           value={profileImage}
           onChange={(e) => setProfileImage(e.target.value)}
         />
-
         <br />
         <button type="submit">저장하기</button>
       </form>
