@@ -19,6 +19,7 @@ interface ChatData {
 interface UserData {
   name: string;
   id: number;
+  status: string;
 }
 
 interface ChannelUsers {
@@ -408,6 +409,7 @@ export default function Channels() {
             sender: {
               id: response.data.sent_by_id,
               name: userData.name,
+              status: userData.status,
             },
           },
         ]);
@@ -632,6 +634,11 @@ export default function Channels() {
               {userData.id !== user.id && (
                 <button>
                   <a href={`/game?userId=${user.id}`}>게임 초대</a>
+                </button>
+              )}
+              {userData.id !== user.id && userData.status == "in_game" && (
+                <button>
+                  <a href={`/game?spectateUserId=${user.id}`}>게임 관전</a>
                 </button>
               )}
             </li>
