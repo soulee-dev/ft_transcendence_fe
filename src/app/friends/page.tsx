@@ -267,6 +267,9 @@ export default function Friends() {
               <button onClick={() => handleCreateDM(friend.id)}>
                 채팅 만들기
               </button>
+              <button>
+                <a href={`/game?userId=${friend.id}`}>게임 초대</a>
+              </button>
             </li>
           ))}
       </ul>
