@@ -9,6 +9,7 @@ import Ball from "@/game/Ball";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import CustomGameModal from "@/components/CustomGameModal";
+import { useRouter } from "next/navigation";
 
 export default function Game() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
@@ -26,6 +27,8 @@ export default function Game() {
   const canvasRef = useRef(null);
   const params = useSearchParams();
 
+  const router = useRouter();
+
   const userIdParam = params.get("userId");
   const roomIdParam = params.get("roomId");
   const spectateUserId = params.get("spectateUserId");
@@ -37,8 +40,6 @@ export default function Game() {
       toast.success("상대방이 입장했습니다!");
       setIsCustomGameModalOpen(true);
     });
-
-    // socket.on("거절 소켓")
 
     socket.on("playerNo", (newPlayerNo: number) => {
       setPlayerNo(newPlayerNo);
@@ -118,7 +119,7 @@ export default function Game() {
       });
     });
 
-    //   Clean up on unmount
+    // Clean up on unmount
     return () => {
       console.log("disconnecting...");
       socket.off("invitedPlayerHasArrived");
@@ -198,7 +199,7 @@ export default function Game() {
       }, 2000);
 
       setTimeout(() => {
-        window.location.href = "/";
+        router.push("/");
       }, 3000);
     });
 
@@ -207,6 +208,29 @@ export default function Game() {
       socket.off("endGame");
     };
   }, [socket, playerNo, isSpectate]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("declinedInvite", () => {
+      toast.error(
+        <>
+          상대방이 초대를 거절했습니다
+          <br />
+          3초 뒤 메인페이지로 돌아갑니다
+        </>
+      );
+      console.log("leave", roomId);
+      socket.emit("leave", roomId);
+
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
+    });
+
+    return () => {
+      socket.off("declinedInvite");
+    };
+  }, [socket, roomId]);
 
   useEffect(() => {
     console.log("loaded...");
