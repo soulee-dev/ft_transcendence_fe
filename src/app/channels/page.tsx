@@ -4,10 +4,11 @@ import { toast } from "react-toastify";
 import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { SocketContext } from "../../contexts/SocketContext";
-import PasswordModal from "../../components/PasswordModal";
+import { SocketContext } from "@/contexts/SocketContext";
+import PasswordModal from "@/components/PasswordModal";
 import InviteModal from "@/components/InviteModal";
 import { useRouter } from "next/navigation";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface ChatData {
   sent_by_id: number;
@@ -60,6 +61,10 @@ export default function Channels() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteData, setInviteData] = useState({} as any);
   const [inviteeUserName, setInviteeUserName] = useState("");
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
 
   const router = useRouter();
 
@@ -150,29 +155,53 @@ export default function Channels() {
   };
 
   useEffect(() => {
-    if (socket) {
-      console.log("socket on");
-      socket.on("notification", (message: any) => {
-        console.log(message);
-        toast.success(message.message);
-        if (message.type === "PUBLIC_CHANNEL_CREATED") {
-          fetchChannels();
-        }
-        if (message.type === "INVITE_CUSTOM_GAME") {
-          setInviteData(message);
-          const access_token = Cookies.get("access_token");
+    const handleNotification = (message: any) => {
+      console.log(message);
+      toast.success(message.message);
+      if (message.type === "PUBLIC_CHANNEL_CREATED") {
+        fetchChannels();
+      }
+      if (message.type === "INVITE_CUSTOM_GAME") {
+        setInviteData(message);
+        const access_token = Cookies.get("access_token");
 
+        axios
+          .get(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
+            }
+          )
+          .then((response) => {
+            setInviteeUserName(response.data.name);
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error((error.response?.data as { message: string })?.message);
+          });
+        setIsInviteModalOpen(true);
+      }
+      if (message.type === "SENT_MESSAGE") {
+        if (message.channelId == selectedChannel) {
           axios
             .get(
               `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
               {
                 headers: {
-                  Authorization: `Bearer ${access_token}`,
+                  Authorization: `Bearer ${Cookies.get("access_token")}`,
                 },
               }
             )
-            .then((response) => {
-              setInviteeUserName(response.data.name);
+            .then((userInfoResponse) => {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  chat: message,
+                  sender: userInfoResponse.data,
+                },
+              ]);
             })
             .catch((error) => {
               console.error(error);
@@ -180,46 +209,20 @@ export default function Channels() {
                 (error.response?.data as { message: string })?.message
               );
             });
-          setIsInviteModalOpen(true);
         }
-        if (message.type === "SENT_MESSAGE") {
-          if (message.channelId == selectedChannel) {
-            axios
-              .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${Cookies.get("access_token")}`,
-                  },
-                }
-              )
-              .then((userInfoResponse) => {
-                setMessages((prev) => [
-                  ...prev,
-                  {
-                    chat: message,
-                    sender: userInfoResponse.data,
-                  },
-                ]);
-              })
-              .catch((error) => {
-                console.error(error);
-                toast.error(
-                  (error.response?.data as { message: string })?.message
-                );
-              });
-          }
-        }
-      });
-    }
-
-    return () => {
-      if (socket) {
-        console.log("socket off");
-        socket.off("notification");
       }
     };
-  }, [socket, selectedChannel]);
+
+    registerNotificationEventHandler(handleNotification);
+
+    return () => {
+      unregisterNotificationEventHandler(handleNotification);
+    };
+  }, [
+    selectedChannel,
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  ]);
 
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);

@@ -105,7 +105,6 @@ export default function Friends() {
 
   useEffect(() => {
     const handleNotification = (message: any) => {
-      toast.success(message.message);
       if (
         message.type == "REQUESTED_FRIEND" ||
         message.type == "DELETED_FRIEND" ||
