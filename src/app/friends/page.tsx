@@ -6,12 +6,16 @@ import { useState, useEffect, useContext, FC } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function Friends() {
   const [friends, setFriends] = useState<User[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [name, setName] = useState<string>("");
-  const socket = useContext(SocketContext);
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
 
   type User = {
     id: number;
@@ -102,11 +106,7 @@ export default function Friends() {
   };
 
   useEffect(() => {
-    if (!socket) return;
-
-    console.log("socket on");
-    socket.on("notification", (message: any) => {
-      console.log(message);
+    const handleNotification = (message: any) => {
       toast.success(message.message);
       if (
         message.type == "REQUESTED_FRIEND" ||
@@ -118,13 +118,14 @@ export default function Friends() {
         fetchFriends();
         fetchFriendRequests();
       }
-    });
+    };
+
+    registerNotificationEventHandler(handleNotification);
 
     return () => {
-      console.log("socket off");
-      socket.off("notification");
+      unregisterNotificationEventHandler(handleNotification);
     };
-  }, [socket]);
+  }, [registerNotificationEventHandler, unregisterNotificationEventHandler]);
 
   const handleFriendRequest = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

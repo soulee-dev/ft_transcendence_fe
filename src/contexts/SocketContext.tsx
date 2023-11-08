@@ -3,15 +3,13 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export const SocketContext = createContext<Socket | null>(null);
 
-interface SocketProviderProps {
-  children: ReactNode;
-}
-
-export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
+export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const { dispatchNotificationEvent } = useNotification();
   const access_token = Cookies.get("access_token");
 
   useEffect(() => {
@@ -25,13 +23,18 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         response
       );
     });
+
+    newSocket.on("notification", (message: any) => {
+      dispatchNotificationEvent(message);
+    });
     setSocket(newSocket);
 
     return () => {
       newSocket.emit("leaveNotificationChannel");
+      newSocket.off("notification");
       newSocket.close();
     };
-  }, [access_token]);
+  }, [access_token, dispatchNotificationEvent]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

@@ -6,6 +6,7 @@ import LeftSide from "../components/server/LeftSide";
 import RightSide from "../components/server/RightSide";
 import TopNavigator from "../components/server/TopNavigator";
 import { SocketProvider } from "../contexts/SocketContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
 import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -90,14 +91,16 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {accessToken.raw ? (
-          <SocketProvider>
-            <TopNavigator />
-            <div className="main">
-              <LeftSide />
-              <div className="center">{children}</div>
-              <RightSide />
-            </div>
-          </SocketProvider>
+          <NotificationProvider>
+            <SocketProvider>
+              <TopNavigator />
+              <div className="main">
+                <LeftSide />
+                <div className="center">{children}</div>
+                <RightSide />
+              </div>
+            </SocketProvider>
+          </NotificationProvider>
         ) : (
           <a href={`${process.env.NEXT_PUBLIC_API_URL}/auth`}>로그인 하기</a>
         )}
