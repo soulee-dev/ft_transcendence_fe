@@ -1,7 +1,6 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -179,7 +178,6 @@ export default function ChannelAdmin() {
 
   return (
     <div>
-      <ToastContainer />
       <ul>
         {adminChannels.map((channel: any) => (
           <li key={channel.id}>

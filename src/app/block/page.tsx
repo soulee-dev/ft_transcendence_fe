@@ -1,7 +1,6 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -89,7 +88,6 @@ export default function Block() {
   };
   return (
     <div>
-      <ToastContainer />
       <h1>차단 목록</h1>
       <ul>
         {blockList &&

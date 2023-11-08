@@ -6,8 +6,7 @@ import { SocketContext } from "@/contexts/SocketContext";
 import Player from "@/game/Player";
 import { useSearchParams } from "next/navigation";
 import Ball from "@/game/Ball";
-import "react-toastify/dist/ReactToastify.css";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import CustomGameModal from "@/components/CustomGameModal";
 import { useRouter } from "next/navigation";
 
@@ -341,7 +340,6 @@ export default function Game() {
 
   return (
     <div className="container">
-      <ToastContainer />
       <CustomGameModal
         isOpen={isCustomGameModalOpen}
         onRequestClose={() => setIsCustomGameModalOpen(false)}

@@ -4,6 +4,7 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 import { useNotification } from "@/contexts/NotificationContext";
+import { toast } from "react-toastify";
 
 export const SocketContext = createContext<Socket | null>(null);
 
@@ -25,6 +26,8 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     });
 
     newSocket.on("notification", (message: any) => {
+      console.log("Received notification:", message);
+      toast.success(message.message);
       dispatchNotificationEvent(message);
     });
     setSocket(newSocket);

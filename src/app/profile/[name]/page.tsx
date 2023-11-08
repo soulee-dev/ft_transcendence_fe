@@ -1,7 +1,6 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -151,7 +150,6 @@ export default function Profile({ params }: ProfileProps) {
 
   return (
     <div>
-      <ToastContainer />
       <h1>Profile</h1>
       {profile && (
         <div>

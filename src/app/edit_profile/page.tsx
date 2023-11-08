@@ -1,8 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, useEffect, FormEvent } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -92,7 +91,6 @@ export default function EditProfile() {
 
   return (
     <div>
-      <ToastContainer />
       <img
         src={userData.profile_image}
         width={100}

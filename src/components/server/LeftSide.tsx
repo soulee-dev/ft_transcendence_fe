@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { parseJWT } from "../../utils/jwt";
@@ -46,7 +45,6 @@ function LeftSide() {
 
   return (
     <div className="leftSide">
-      <ToastContainer />
       <ul>
         <li>
           <Link href="/edit_profile">마이페이지</Link>

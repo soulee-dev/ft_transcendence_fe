@@ -12,6 +12,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { parseJWT } from "../utils/jwt";
 import { redirect, usePathname } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -93,6 +95,7 @@ export default function RootLayout({
         {accessToken.raw ? (
           <NotificationProvider>
             <SocketProvider>
+              <ToastContainer />
               <TopNavigator />
               <div className="main">
                 <LeftSide />

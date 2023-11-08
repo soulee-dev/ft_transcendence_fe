@@ -1,11 +1,9 @@
 "use client";
 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useState, useEffect, useContext, FC } from "react";
+import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { SocketContext } from "../../contexts/SocketContext";
 import { useNotification } from "@/contexts/NotificationContext";
 
 export default function Friends() {
@@ -250,7 +248,6 @@ export default function Friends() {
 
   return (
     <div>
-      <ToastContainer />
       <h1>친구 목록</h1>
       <ul>
         {friends &&

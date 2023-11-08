@@ -1,7 +1,6 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -519,7 +518,6 @@ export default function Channels() {
 
   return (
     <div>
-      <ToastContainer />
       <InviteModal
         isOpen={isInviteModalOpen}
         onReuqestClose={() => setIsInviteModalOpen(false)}
