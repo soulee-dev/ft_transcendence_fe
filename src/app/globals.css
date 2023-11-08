@@ -716,3 +716,8 @@ canvas {
 #startBtn:hover {
 	filter: brightness(0.8);
 }
+
+.topNav {
+  font-size: 20px;
+  color: white;
+}

@@ -292,7 +292,7 @@ export default function Game() {
         onRequestClose={() => setIsCustomGameModalOpen(false)}
         onSubmit={onSubmitCustomGameSetting}
       />
-      <h1 id="heading">PING PONG</h1>
+      <h1 id="heading">PONG</h1>
       <div className="game">
         <canvas id="canvas" ref={canvasRef} width="800" height="500"></canvas>
         <p id="message"> {message}</p>
