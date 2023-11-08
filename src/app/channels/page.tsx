@@ -156,8 +156,6 @@ export default function Channels() {
 
   useEffect(() => {
     const handleNotification = (message: any) => {
-      console.log(message);
-      toast.success(message.message);
       if (message.type === "PUBLIC_CHANNEL_CREATED") {
         fetchChannels();
       }

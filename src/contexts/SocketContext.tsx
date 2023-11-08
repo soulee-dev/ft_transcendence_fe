@@ -28,7 +28,12 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
     newSocket.on("notification", (message: any) => {
       console.log("Received notification:", message);
-      toast.success(message.message);
+      if (message.type == "SENT_MESSAGE") {
+        toast.success("새 메시지가 왔습니다: " + message.message);
+      } else {
+        toast.success(message.message);
+      }
+
       dispatchNotificationEvent(message);
     });
     setSocket(newSocket);
