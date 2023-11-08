@@ -12,8 +12,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { parseJWT } from "../utils/jwt";
 import { redirect, usePathname } from "next/navigation";
-import { ToastContainer, toast } from "react-toastify";
-import { useNotification } from "@/contexts/NotificationContext";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -29,10 +28,6 @@ export default function RootLayout({
     sub: "",
     is_2fa: false,
   });
-  const {
-    registerNotificationEventHandler,
-    unregisterNotificationEventHandler,
-  } = useNotification();
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
@@ -90,18 +85,6 @@ export default function RootLayout({
       window.removeEventListener("beforeunload", updateOfflineStatus);
     };
   }, [accessToken]);
-
-  useEffect(() => {
-    const handleNotification = (message: any) => {
-      toast.success(message.message);
-    };
-
-    registerNotificationEventHandler(handleNotification);
-
-    return () => {
-      unregisterNotificationEventHandler(handleNotification);
-    };
-  }, [registerNotificationEventHandler, unregisterNotificationEventHandler]);
 
   if (accessToken.raw && pageName != "2fa" && !accessToken.is_2fa)
     redirect(`/2fa/${accessToken.sub}`);
