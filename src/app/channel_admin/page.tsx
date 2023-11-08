@@ -5,6 +5,7 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useEffect } from "react";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function ChannelAdmin() {
   const [adminChannels, setAdminChannels] = useState<any>([]);
@@ -15,6 +16,27 @@ export default function ChannelAdmin() {
   const [mutedUsers, setMutedUsers] = useState<any>([]);
   const [banList, setBanList] = useState<any>([]);
   const [hasPassword, setHasPassword] = useState(false);
+
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
+
+  useEffect(() => {
+    const handleNotification = (message: any) => {
+      if (message.type == "USER_JOIN_CHANNEL") {
+        if (selectedChannel == message.channelId) {
+          fetchChannelUsers(selectedChannel);
+        }
+      }
+    };
+
+    registerNotificationEventHandler(handleNotification);
+
+    return () => {
+      unregisterNotificationEventHandler(handleNotification);
+    };
+  }, [registerNotificationEventHandler, unregisterNotificationEventHandler]);
 
   useEffect(() => {
     fetchChnnelInfo();

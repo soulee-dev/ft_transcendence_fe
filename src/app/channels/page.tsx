@@ -213,12 +213,13 @@ export default function Channels() {
 
   useEffect(() => {
     const handleNotification = (message: any) => {
-      if (
-        message.type === "PUBLIC_CHANNEL_CREATED" ||
-        message.type == "KICKED" ||
-        message.type == "BANNED"
-      ) {
+      if (message.type === "PUBLIC_CHANNEL_CREATED") {
         fetchChannels();
+      }
+
+      if (message.type == "KICKED" || message.type == "BANNED") {
+        fetchChannels();
+        setSelectedChannel(0);
       }
 
       if (message.type == "GIVEN_ADMIN") {

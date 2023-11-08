@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { parseJWT } from "../utils/jwt";
 import { redirect, usePathname } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
