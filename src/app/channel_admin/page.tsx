@@ -62,14 +62,11 @@ export default function ChannelAdmin() {
   const fetchChannelUsers = (channelId: number) => {
     const access_token = Cookies.get("access_token");
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/${channelId}/users`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
       .then((response) => {
         const fetchUserInfosPromises = response.data.map((userData: any) => {
           return axios
@@ -266,13 +263,24 @@ export default function ChannelAdmin() {
                   >
                     MUTE
                   </button>
-                  <button
-                    onClick={() =>
-                      handleAdminUser(user.userData.id, "GIVEADMIN")
-                    }
-                  >
-                    GIVEADMIN
-                  </button>
+                  {!user.channelData.admin && (
+                    <button
+                      onClick={() =>
+                        handleAdminUser(user.userData.id, "GIVEADMIN")
+                      }
+                    >
+                      GIVEADMIN
+                    </button>
+                  )}
+                  {user.channelData.admin && (
+                    <button
+                      onClick={() =>
+                        handleAdminUser(user.userData.id, "REMOVEADMIN")
+                      }
+                    >
+                      REMOVEADMIN
+                    </button>
+                  )}
                 </>
               )}
             </li>
