@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios, { AxiosResponse, AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 interface TwoFAProps {
   params: {
@@ -17,6 +18,8 @@ interface ResponseData {
 
 export default function TwoFA({ params }: TwoFAProps) {
   const [code, setCode] = useState<string>("");
+
+  const router = useRouter();
 
   const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCode(event.target.value);
@@ -40,7 +43,7 @@ export default function TwoFA({ params }: TwoFAProps) {
       .then((response: AxiosResponse<ResponseData>) => {
         console.log(response.data);
         if (response.data.redirectURI) {
-          window.location.href = response.data.redirectURI;
+          router.push(response.data.redirectURI);
         }
       })
       .catch((error: AxiosError) => {

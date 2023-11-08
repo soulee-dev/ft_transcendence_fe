@@ -8,6 +8,7 @@ import axios from "axios";
 import { SocketContext } from "../../contexts/SocketContext";
 import PasswordModal from "../../components/PasswordModal";
 import InviteModal from "@/components/InviteModal";
+import { useRouter } from "next/navigation";
 
 interface ChatData {
   sent_by_id: number;
@@ -59,6 +60,8 @@ export default function Channels() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteData, setInviteData] = useState({} as any);
   const [inviteeUserName, setInviteeUserName] = useState("");
+
+  const router = useRouter();
 
   const fetchChannels = () => {
     fetchJoinedChannels();
@@ -502,7 +505,7 @@ export default function Channels() {
       </>
     );
     // redirect after 3 sconds
-    window.location.href = `/game?roomId=${inviteData.channelId}`;
+    router.push(`/game?roomId=${inviteData.channelId}`);
   };
 
   const handleRejectInvite = () => {
