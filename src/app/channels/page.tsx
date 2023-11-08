@@ -636,7 +636,7 @@ export default function Channels() {
                   <a href={`/game?userId=${user.id}`}>게임 초대</a>
                 </button>
               )}
-              {userData.id !== user.id && userData.status == "in_game" && (
+              {userData.id !== user.id && user.status == "in_game" && (
                 <button>
                   <a href={`/game?spectateUserId=${user.id}`}>게임 관전</a>
                 </button>
