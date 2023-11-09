@@ -34,21 +34,7 @@
   width: 240px;
   flex-direction: row;
 }
-.div9 {
-  border-radius: var(--br-13xl);
-  background-color: var(--color-white);
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.div8 {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: var(--padding-9xs);
-}
+
 .frinedNickname {
   position: relative;
   display: flex;

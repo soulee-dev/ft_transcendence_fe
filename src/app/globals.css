@@ -335,6 +335,7 @@ body {
   justify-content: center;
   cursor: pointer;
 }
+
 .topNav {
   background-color: black;
   border: 1px solid white;
@@ -345,6 +346,7 @@ body {
   height: 42px;
   color: #a0a0a0;
 }
+
 .div129,
 .wrapper3 {
   display: flex;
@@ -582,8 +584,8 @@ canvas {
   justify-content: center;
   align-items: center;
   display: flex;
-  width: 500px;
-  height: 727px;
+  width: 498px;
+  height: 726px;
   overflow-y: scroll;
 }
 
@@ -611,6 +613,7 @@ canvas {
   display: flex;
   flex-direction: column;
   /* align-items: center; */
+  margin: 0 5px;
   /* justify-content: center; */
   flex: 1;
   padding-bottom: 20px;
@@ -624,40 +627,31 @@ canvas {
 }
 
 .find-profile {
-  display: flex;
-  flex-direction: column; /* 컨테이너를 세로로 나열 */
-  background-color: black;
-  align-items: center;
-  height: 726px;
-  width: 100%;
-  justify-content: space-between;
-}
-
-.div9 {
-  border-radius: var(--br-13xl);
-  background-color: var(--color-white);
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.div8 {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: var(--padding-9xs);
-}
-
-.friend-menu-container {
-  display: flex;
+  width: 480px;
+  height: 720px;
   flex-direction: column;
-  /* align-items: center; */
-  /* justify-content: center; */
   flex: 1;
-  padding-bottom: 20px;
-  width : 420px;
-  overflow-y: scroll; 
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+  padding-bottom: 10px;
+  margin: 10px; /* 모든 방향(상, 하, 좌, 우)에 10px의 간격 설정 */
+}
+
+.find-profile h1 {
+  margin-bottom: 20px; /* 하단에 20px의 간격 추가 */
+}
+
+.find-profile form label {
+  margin-bottom: 5px; /* 하단에 5px의 간격 추가 */
+}
+
+.find-profile form input[type="text"] {
+  margin-bottom: 10px; /* 하단에 10px의 간격 추가 */
+}
+
+.find-profile form button {
+  margin-top: 10px; /* 상단에 10px의 간격 추가 */
 }
 
 /* GAME */
@@ -678,6 +672,7 @@ canvas {
 	display: flex;
 	width: 500px;
   height: 727px;
+  overflow: hidden;
 }
 
 #heading {
@@ -720,4 +715,102 @@ canvas {
 .topNav {
   font-size: 20px;
   color: white;
+}
+
+.chatting-management {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.ranking {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.myPage {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+  padding-bottom: 10px;
+}
+
+.myPage h2 {
+  margin-bottom: 20px; /* 하단에 20px의 간격 추가 */
+}
+
+.myPage img {
+  margin: 0 10px; /* 좌우에 10px의 간격 설정, 상하에는 간격이 없도록 설정 */
+}
+
+.myPage form label {
+  margin-bottom: 5px; /* 하단에 5px의 간격 추가 */
+}
+
+.myPage form input[type="text"],
+.myPage form input[type="checkbox"],
+.myPage form input[type="email"] {
+  /* 입력 요소의 간격 설정 */
+  margin-bottom: 10px; /* 하단에 10px의 간격 추가 */
+}
+
+.myPage form button {
+  /* 버튼 요소의 간격 설정 */
+  margin-top: 10px; /* 상단에 10px의 간격 추가 */
+}
+
+.friend-menu-container {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.friend-menu-container ul, 
+.friend-menu-container li {
+  align-items: center;
+  margin-bottom: 10px;
+  flex-direction: column;
+  margin: 0 10px;
+}
+
+.friend-menu-container-elem {
+  display: flex;
+  margin-bottom: 10px;
+}
+.friend-menu-container-elem {
+  display: flex;
+  align-items: center;
+  margin: 5px; 
+}
+
+.friend-menu-container-elem a,
+.friend-menu-container-elem button {
+  margin: 0 5px; 
+}
+
+.banPage {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
 }

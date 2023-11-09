@@ -88,7 +88,7 @@ export default function Block() {
       });
   };
   return (
-    <div>
+    <div className="banPage">
       <ToastContainer />
       <h1>차단 목록</h1>
       <ul>

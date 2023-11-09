@@ -91,8 +91,9 @@ export default function EditProfile() {
   };
 
   return (
-    <div>
+    <div className="myPage">
       <ToastContainer />
+      <h2>마이페이지</h2>
       <img
         src={userData.profile_image}
         width={100}

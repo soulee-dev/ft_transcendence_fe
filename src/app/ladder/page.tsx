@@ -46,7 +46,7 @@ const LadderPage = () => {
 
   return (
     // Render user rank using table format
-    <div>
+    <div className="ranking">
       <h1>랭킹</h1>
       <table>
         <thead>

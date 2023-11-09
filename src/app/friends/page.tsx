@@ -257,15 +257,15 @@ export default function Friends() {
         {friends &&
           friends.length > 0 &&
           friends.map((friend) => (
-            <li key={friend.name}>
+            <li className="friend-menu-container-elem" key={friend.name}>
               <a href={`/profile/${friend.name}`}>
                 [{friend.status}] {friend.name}
               </a>
-              <button onClick={() => handleFriendDelete(friend.name)}>
-                삭제
-              </button>
               <button onClick={() => handleCreateDM(friend.id)}>
                 채팅 만들기
+              </button>
+              <button onClick={() => handleFriendDelete(friend.name)}>
+                친구 삭제
               </button>
             </li>
           ))}
