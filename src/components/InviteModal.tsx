@@ -31,6 +31,7 @@ const InviteModal = () => {
       </>
     );
     // redirect after 3 sconds
+    closeInviteModal();
     router.push(`/game?roomId=${inviteData.channelId}`);
   };
 
@@ -38,6 +39,12 @@ const InviteModal = () => {
     if (!socket) return;
     socket.emit("declineInvite", inviteData.channelId);
     toast.success("초대를 거절했습니다.");
+    closeInviteModal();
+  };
+
+  const handleClose = () => {
+    if (!socket) return;
+    socket.emit("declineInvite", inviteData.channelId);
     closeInviteModal();
   };
 
@@ -51,7 +58,7 @@ const InviteModal = () => {
       <h2>{inviteeUserName}의 게임 초대가 왔습니다!</h2>
       <button onClick={handleAcceptInvite}>수락</button>
       <button onClick={handleRejectInvite}>거절</button>
-      <button onClick={closeInviteModal}>닫기</button>
+      <button onClick={handleClose}>닫기</button>
     </Modal>
   );
 };
