@@ -24,7 +24,6 @@ export default function Game() {
   const [ball, setBall] = useState<Ball | null>(null);
   const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
   const [isSpectate, setIsSpectate] = useState(false);
-  const [winnerName, setWinnerName] = useState("");
 
   const canvasRef = useRef(null);
   const params = useSearchParams();
@@ -177,7 +176,6 @@ export default function Game() {
     if (!socket) return;
     socket.on("endGame", (room) => {
       const access_token = Cookies.get("access_token");
-
       axios
         .get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${room.winner}`, {
           headers: {
@@ -185,16 +183,16 @@ export default function Game() {
           },
         })
         .then((response) => {
-          setWinnerName(response.data.name);
+          setMessage(
+            `${response.data.name} 플레이어가 승리했습니다! 3초 뒤 메인페이지로 돌아갑니다...`
+          );
         })
         .catch((error) => {
           console.error(error);
           toast.error((error.response?.data as { message: string })?.message);
         });
       setGameStarted(false);
-      setMessage(
-        `${winnerName} 플레이어가 승리했습니다! 3초 뒤 메인페이지로 돌아갑니다...`
-      );
+
       if (isSpectate) {
         socket.emit("leaveAsSpectator", roomId);
       } else {
