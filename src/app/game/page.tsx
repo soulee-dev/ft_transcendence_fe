@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 export default function Game() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
-  const socket = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const [isGameStarted, setGameStarted] = useState(false);
   const [playerNo, setPlayerNo] = useState(0);
   const [roomId, setRoomID] = useState(0);

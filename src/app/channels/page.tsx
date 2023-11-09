@@ -6,7 +6,6 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { SocketContext } from "@/contexts/SocketContext";
 import PasswordModal from "@/components/PasswordModal";
-import InviteModal from "@/components/InviteModal";
 import { useRouter } from "next/navigation";
 import { useNotification } from "@/contexts/NotificationContext";
 
@@ -52,15 +51,12 @@ export default function Channels() {
   const [userList, setUserList] = useState<string[]>([]);
   const selectOption: string[] = ["PUBLIC", "PRIVATE"];
   const [selected, setSelected] = useState<string>(selectOption[0]);
-  const socket = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [privateModalIsOpen, setPrivateModalIsOpen] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
   const [privateChannelName, setPrivateChannelName] = useState<string>("");
   const [channelUsers, setChannelUsers] = useState<ChannelUsers[]>([]);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [inviteData, setInviteData] = useState({} as any);
-  const [inviteeUserName, setInviteeUserName] = useState("");
   const {
     registerNotificationEventHandler,
     unregisterNotificationEventHandler,
@@ -225,28 +221,7 @@ export default function Channels() {
       if (message.type == "GIVEN_ADMIN") {
         fetchChannelUsers();
       }
-      if (message.type === "INVITE_CUSTOM_GAME") {
-        setInviteData(message);
-        const access_token = Cookies.get("access_token");
 
-        axios
-          .get(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${access_token}`,
-              },
-            }
-          )
-          .then((response) => {
-            setInviteeUserName(response.data.name);
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error((error.response?.data as { message: string })?.message);
-          });
-        setIsInviteModalOpen(true);
-      }
       if (message.type === "SENT_MESSAGE") {
         if (message.channelId == selectedChannel) {
           axios
@@ -513,33 +488,8 @@ export default function Channels() {
       });
   };
 
-  const handleAcceptInvite = () => {
-    toast.success(
-      <>
-        초대를 수락했습니다.
-        <br />곧 게임을 시작합니다.
-      </>
-    );
-    // redirect after 3 sconds
-    router.push(`/game?roomId=${inviteData.channelId}`);
-  };
-
-  const handleRejectInvite = () => {
-    if (!socket) return;
-    socket.emit("declineInvite", inviteData.channelId);
-    toast.success("초대를 거절했습니다.");
-    setIsInviteModalOpen(false);
-  };
-
   return (
     <div>
-      <InviteModal
-        isOpen={isInviteModalOpen}
-        onReuqestClose={() => setIsInviteModalOpen(false)}
-        handleAcceptInvite={handleAcceptInvite}
-        handleRejectInvite={handleRejectInvite}
-        inviteeUserName={inviteeUserName}
-      />
       <PasswordModal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
