@@ -9,6 +9,8 @@ import Ball from "@/game/Ball";
 import { toast } from "react-toastify";
 import CustomGameModal from "@/components/CustomGameModal";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Game() {
   const [isButtonVisible, setIsButtonVisible] = useState(true);
@@ -22,6 +24,7 @@ export default function Game() {
   const [ball, setBall] = useState<Ball | null>(null);
   const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
   const [isSpectate, setIsSpectate] = useState(false);
+  const [winnerName, setWinnerName] = useState("");
 
   const canvasRef = useRef(null);
   const params = useSearchParams();
@@ -173,13 +176,24 @@ export default function Game() {
   useEffect(() => {
     if (!socket) return;
     socket.on("endGame", (room) => {
+      const access_token = Cookies.get("access_token");
+
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${room.winner}`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+        .then((response) => {
+          setWinnerName(response.data.name);
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error((error.response?.data as { message: string })?.message);
+        });
       setGameStarted(false);
       setMessage(
-        `${
-          room.winner === playerNo
-            ? "이겼습니다! 3초 뒤 메인페이지로 돌아갑니다"
-            : "졌습니다! 3초 뒤 메인페이지로 돌아갑니다"
-        }`
+        `${winnerName} 플레이어가 승리했습니다! 3초 뒤 메인페이지로 돌아갑니다...`
       );
       if (isSpectate) {
         socket.emit("leaveAsSpectator", roomId);
