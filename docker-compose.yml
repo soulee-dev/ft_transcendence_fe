@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  nextjs-app:
+    container_name: nextjs-app
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm start
