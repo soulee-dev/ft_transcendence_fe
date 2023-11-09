@@ -341,11 +341,17 @@ export default function Game() {
     };
   }, [isGameStarted, playerNo, roomId]);
 
+  const handleClose = () => {
+    if (!socket) return;
+    socket.emit("cancelMatch", roomId);
+    setIsCustomGameModalOpen(false);
+  };
+
   return (
     <div className="container">
       <CustomGameModal
         isOpen={isCustomGameModalOpen}
-        onRequestClose={() => setIsCustomGameModalOpen(false)}
+        onRequestClose={handleClose}
         onSubmit={onSubmitCustomGameSetting}
       />
       <h1 id="heading">PING PONG</h1>
