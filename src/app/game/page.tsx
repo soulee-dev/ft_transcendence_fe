@@ -228,6 +228,7 @@ export default function Game() {
 
     return () => {
       socket.off("declinedInvite");
+      if (!roomId) return;
       socket.emit("cancelMatch", roomId);
       socket.emit("leaveAsSpectator", roomId);
     };
