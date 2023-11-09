@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Modal from "react-modal";
 
 interface InviteModalProps {
