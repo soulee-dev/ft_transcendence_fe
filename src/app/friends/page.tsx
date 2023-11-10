@@ -246,21 +246,21 @@ export default function Friends() {
   }, []);
 
   return (
-    <div>
-      <h1>친구 목록</h1>
+    <div className="friend-menu-container">
+      <h2>친구 목록</h2>
       <ul>
         {friends &&
           friends.length > 0 &&
           friends.map((friend) => (
-            <li key={friend.name}>
+            <li className="friend-menu-container-elem" key={friend.name}>
               <a href={`/profile/${friend.name}`}>
                 [{friend.status}] {friend.name}
               </a>
-              <button onClick={() => handleFriendDelete(friend.name)}>
-                삭제
-              </button>
               <button onClick={() => handleCreateDM(friend.id)}>
                 채팅 만들기
+              </button>
+              <button onClick={() => handleFriendDelete(friend.name)}>
+                친구 삭제
               </button>
               {friend.status != "in_game" && (
                 <button>
@@ -275,7 +275,7 @@ export default function Friends() {
             </li>
           ))}
       </ul>
-      <h1>친구 요청 목록</h1>
+      <h2>친구 요청 목록</h2>
       <ul>
         {friendRequests &&
           friendRequests.length > 0 &&
@@ -295,18 +295,20 @@ export default function Friends() {
             </li>
           ))}
       </ul>
-      <h1>친구 요청</h1>
-      <form onSubmit={handleFriendRequest}>
-        <label htmlFor="name">이름</label>
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="name"
-        />
-        <button type="submit">Submit</button>
-      </form>
+      <h2>친구 요청</h2>
+      <div className="form-container">
+        <form onSubmit={handleFriendRequest}>
+          <label htmlFor="name">이름</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="name"
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </div>
   );
 }

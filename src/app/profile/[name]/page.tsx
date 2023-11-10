@@ -187,7 +187,7 @@ export default function Profile({ params }: ProfileProps) {
           </table>
 
           <button onClick={() => handleAddFriend(profile.name)}>
-            친구 추가하기
+            친구 추가
           </button>
         </div>
       )}

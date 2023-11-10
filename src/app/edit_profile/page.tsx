@@ -92,7 +92,8 @@ export default function EditProfile() {
   };
 
   return (
-    <div>
+    <div className="myPage">
+      <h2>마이페이지</h2>
       <img
         src={userData.profile_image}
         width={100}
@@ -136,7 +137,6 @@ export default function EditProfile() {
           value={profileImage}
           onChange={(e) => setProfileImage(e.target.value)}
         />
-
         <br />
         <button type="submit">저장하기</button>
       </form>

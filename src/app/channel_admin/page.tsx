@@ -196,7 +196,8 @@ export default function ChannelAdmin() {
   };
 
   return (
-    <div>
+    <div className="chatting-management">
+      <h1>채팅방 관리ㅋㅋ</h1>
       <ul>
         {adminChannels.map((channel: any) => (
           <li key={channel.id}>
@@ -206,7 +207,7 @@ export default function ChannelAdmin() {
           </li>
         ))}
       </ul>
-      <h2>선택된 채팅방: {selectedChannel}</h2>
+      <h3>선택된 채팅방: {selectedChannel}</h3>
       {selectedChannel != 0 && (
         <div>
           <h2>채팅방 수정하기</h2>

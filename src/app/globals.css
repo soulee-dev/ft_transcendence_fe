@@ -1,3 +1,8 @@
+* {
+  font-family: 'Cassiopeia';
+  color: white;
+}
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -39,6 +44,13 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+}
+
+@font-face {
+  font-family: 'Cassiopeia'; /* 원하는 폰트 이름 설정 */
+  src: url('../font/AaCassiopeia.ttf') format('truetype'); /* 폰트 파일 경로 설정 */
+  font-weight: normal; /* 폰트 두께 설정 */
+  font-style: normal; /* 폰트 스타일 설정 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -113,8 +125,10 @@ body {
 .main {
   flex: 1;
   display: flex;
-  flex-direction: row;
   background-color: black;
+  align-items: center;
+  justify-content: center;
+  height: 726px;
 }
 
 .friendList,
@@ -152,21 +166,6 @@ body {
 .frinedAndChatNav {
   width: 240px;
   flex-direction: row;
-}
-.div9 {
-  border-radius: var(--br-13xl);
-  background-color: var(--color-white);
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.div8 {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: var(--padding-9xs);
 }
 .frinedNickname {
   position: relative;
@@ -257,7 +256,7 @@ body {
   color: #5498ef;
 }
 .rightSide {
-  border: 1px solid white;
+  /* border: 1px solid white; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,12 +292,15 @@ body {
   justify-content: flex-start;
   gap: var(--gap-3xs);
 }
+
 .leftSide {
   border: 1px solid white;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 260px;
+  height: 726px;
+  font-size: 24px;
 }
 .image-5-icon {
   position: relative;
@@ -333,6 +335,7 @@ body {
   justify-content: center;
   cursor: pointer;
 }
+
 .topNav {
   background-color: black;
   border: 1px solid white;
@@ -343,6 +346,7 @@ body {
   height: 42px;
   color: #a0a0a0;
 }
+
 .div129,
 .wrapper3 {
   display: flex;
@@ -363,19 +367,7 @@ body {
   cursor: pointer;
 }
 
-.center {
-  flex:1;
-  /* width: 1500px; */
-  border: 1px solid white;
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* width: 502px; */
-  /* TODO: 원래 픽셀 503 */
-  /* height: 727px; */
-  /* overflow: hidden; */
-}
+
 .div130 {
   top: 44px;
   left: 1015px;
@@ -563,4 +555,262 @@ body {
 
 canvas {
   position: absolute;
+}
+
+.loginPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;  
+  width: 1024px;
+  height: 768px;
+  /* min-width: 100px; */
+  min-height: 768px;
+  border: 1px solid white;
+  margin: auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.center {
+  /* flex:1; */
+  /* width: 1500px; */
+  /* width: 502px; */
+  /* TODO: 원래 픽셀 503 */
+  /* height: 727px; */
+  
+  flex: 1;
+  border: 1px solid white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 498px;
+  height: 726px;
+  overflow-y: scroll;
+}
+
+.chatting {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px solid white; */
+  overflow-y: scroll;
+}
+
+.makeChattingRoom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #4a4a4a;
+  width: 5px;
+  height: 253px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  margin: 0 5px;
+  /* justify-content: center; */
+  flex: 1;
+  padding-bottom: 20px;
+  width : 140px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.find-profile {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+  padding-bottom: 10px;
+  margin: 10px; /* 모든 방향(상, 하, 좌, 우)에 10px의 간격 설정 */
+}
+
+.find-profile h1 {
+  margin-bottom: 20px; /* 하단에 20px의 간격 추가 */
+}
+
+.find-profile form label {
+  margin-bottom: 5px; /* 하단에 5px의 간격 추가 */
+}
+
+.find-profile form input[type="text"] {
+  margin-bottom: 10px; /* 하단에 10px의 간격 추가 */
+}
+
+.find-profile form button {
+  margin-top: 10px; /* 상단에 10px의 간격 추가 */
+}
+
+/* GAME */
+
+.container {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 500px;
+  /* background-color: black; */
+	/* height: 72 7px; */
+}
+
+.game{
+	position: relative;
+  flex: 1;
+	display: flex;
+	width: 500px;
+  height: 727px;
+  overflow: hidden;
+}
+
+#heading {
+	text-align: center;
+	/* font-size: 48px; */
+}
+
+#canvas {
+	margin-top: 10px;
+	/* background-color: black; */
+}
+
+#message {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	/* color: white; */
+	transform: translate(-50%, -50%);
+	font-size: 12px;
+}
+
+#startBtn {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	font-size: 20px;
+	transform: translate(-50%, -50%);
+	background-color: white;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 10px 20px;
+	color: black;
+}
+
+#startBtn:hover {
+	filter: brightness(0.8);
+}
+
+.topNav {
+  font-size: 20px;
+  color: white;
+}
+
+.chatting-management {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.ranking {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.myPage {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+  padding-bottom: 10px;
+}
+
+.myPage h2 {
+  margin-bottom: 20px; /* 하단에 20px의 간격 추가 */
+}
+
+.myPage img {
+  margin: 0 10px; /* 좌우에 10px의 간격 설정, 상하에는 간격이 없도록 설정 */
+}
+
+.myPage form label {
+  margin-bottom: 5px; /* 하단에 5px의 간격 추가 */
+}
+
+.myPage form input[type="text"],
+.myPage form input[type="checkbox"],
+.myPage form input[type="email"] {
+  /* 입력 요소의 간격 설정 */
+  margin-bottom: 10px; /* 하단에 10px의 간격 추가 */
+}
+
+.myPage form button {
+  /* 버튼 요소의 간격 설정 */
+  margin-top: 10px; /* 상단에 10px의 간격 추가 */
+}
+
+.friend-menu-container {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+}
+
+.friend-menu-container ul, 
+.friend-menu-container li {
+  align-items: center;
+  margin-bottom: 10px;
+  flex-direction: column;
+  margin: 0 10px;
+}
+
+.friend-menu-container-elem {
+  display: flex;
+  margin-bottom: 10px;
+}
+.friend-menu-container-elem {
+  display: flex;
+  align-items: center;
+  margin: 5px; 
+}
+
+.friend-menu-container-elem a,
+.friend-menu-container-elem button {
+  margin: 0 5px; 
+}
+
+.banPage {
+  width: 480px;
+  height: 720px;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
 }
