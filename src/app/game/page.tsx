@@ -23,7 +23,6 @@ export default function Game() {
   const [ball, setBall] = useState<Ball | null>(null);
   const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
   const [isSpectate, setIsSpectate] = useState(false);
-
   const canvasRef = useRef(null);
   const params = useSearchParams();
 

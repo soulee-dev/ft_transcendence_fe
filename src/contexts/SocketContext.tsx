@@ -23,6 +23,7 @@ export const SocketContext = createContext<{
   closeInviteModal: () => {},
 });
 
+
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const { dispatchNotificationEvent } = useNotification();

@@ -92,7 +92,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      {accessToken.raw ? (
+      {accessToken.raw ? pageName != "game" ? (
         <body className={inter.className}>
         
         <NotificationProvider>
@@ -109,7 +109,14 @@ export default function RootLayout({
           </div>
           </SocketProvider>
           </NotificationProvider>
-        </body> ) : (
+        </body> ) :(<body className={inter.className}>
+        
+        <NotificationProvider>
+            <SocketProvider>
+              
+          </SocketProvider>
+          </NotificationProvider>
+        </body>) : (
                   <body
                     style={{
                       display: "flex",
