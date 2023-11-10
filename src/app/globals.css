@@ -662,7 +662,7 @@ canvas {
 	flex-direction: column;
 	align-items: center;
 	width: 500px;
-  background-color: black;
+  /* background-color: black; */
 	/* height: 72 7px; */
 }
 
@@ -677,19 +677,19 @@ canvas {
 
 #heading {
 	text-align: center;
-	font-size: 48px;
+	/* font-size: 48px; */
 }
 
 #canvas {
 	margin-top: 10px;
-	background-color: black;
+	/* background-color: black; */
 }
 
 #message {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	color: white;
+	/* color: white; */
 	transform: translate(-50%, -50%);
 	font-size: 12px;
 }
