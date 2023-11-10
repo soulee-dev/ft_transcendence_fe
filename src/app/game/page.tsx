@@ -1,5 +1,6 @@
 "use client";
 
+import "@/style/Game.css"
 import { useState, useEffect, useRef, useContext } from "react";
 import { SocketContext } from "@/contexts/SocketContext";
 import Player from "@/game/Player";

@@ -670,7 +670,7 @@ canvas {
 	position: relative;
   flex: 1;
 	display: flex;
-	width: 500px;
+	/* width: 500px; */
   height: 727px;
   overflow: hidden;
 }
