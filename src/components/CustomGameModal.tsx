@@ -20,6 +20,31 @@ const CustomGameModal: React.FC<CustomGameModalProps> = ({
       ariaHideApp={false}
       onRequestClose={onRequestClose}
       contentLabel="게임 옵션 설정"
+      style={{
+        overlay: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0)',
+          height: '770px',
+        },
+        content: {
+          position: 'absolute',
+          top: '40px',
+          left: '40px',
+          right: '40px',
+          bottom: '40px',
+          border: '1px solid #ccc',
+          overflow: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          borderRadius: '4px',
+          outline: 'none',
+          padding: '20px',
+          backgroundColor: 'rgba(0, 0, 0)',
+        }
+      }}
     >
       <h2>게임 속도를 지정해주세요</h2>
       <h3>속도: {sliderValue}x</h3>
