@@ -1,4 +1,3 @@
-# Stage 1: Building the code
 FROM node:lts-alpine as builder
 
 WORKDIR /app
@@ -7,7 +6,6 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 2: Run the built app
 FROM node:lts-alpine
 
 WORKDIR /app
