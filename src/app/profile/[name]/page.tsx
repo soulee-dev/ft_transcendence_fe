@@ -1,10 +1,10 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
-import { useState, useEffect, FormEvent } from "react";
+import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { useRouter } from "next/navigation";
 
 interface ProfileProps {
   params: {
@@ -26,6 +26,8 @@ export default function Profile({ params }: ProfileProps) {
     rank: 0,
   });
   const [recordData, setRecordData] = useState<any>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const access_token = Cookies.get("access_token");
@@ -49,7 +51,7 @@ export default function Profile({ params }: ProfileProps) {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!profile) {
-        window.location.href = "/profile";
+        router.push("/profile");
       }
     }, 3000);
     return () => {
@@ -92,10 +94,10 @@ export default function Profile({ params }: ProfileProps) {
         // Map records to promises to fetch user profiles
         const userPromises = records.map((record: any) => {
           return Promise.all([
-            axios.get(`http://localhost:3000/users/id/${record.player1_id}`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player1_id}`, {
               headers: { Authorization: `Bearer ${access_token}` },
             }),
-            axios.get(`http://localhost:3000/users/id/${record.player2_id}`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player2_id}`, {
               headers: { Authorization: `Bearer ${access_token}` },
             }),
           ]).then(([player1Response, player2Response]) => {
@@ -148,7 +150,6 @@ export default function Profile({ params }: ProfileProps) {
 
   return (
     <div>
-      <ToastContainer />
       <h1>Profile</h1>
       {profile && (
         <div>

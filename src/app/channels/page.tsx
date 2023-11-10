@@ -1,13 +1,13 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, useEffect, ChangeEvent, useContext } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { SocketContext } from "../../contexts/SocketContext";
-import PasswordModal from "../../components/PasswordModal";
-import InviteModal from "@/components/InviteModal";
+import { SocketContext } from "@/contexts/SocketContext";
+import PasswordModal from "@/components/PasswordModal";
+import { useRouter } from "next/navigation";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface ChatData {
   sent_by_id: number;
@@ -18,6 +18,7 @@ interface ChatData {
 interface UserData {
   name: string;
   id: number;
+  status: string;
 }
 
 interface ChannelUsers {
@@ -50,15 +51,75 @@ export default function Channels() {
   const [userList, setUserList] = useState<string[]>([]);
   const selectOption: string[] = ["PUBLIC", "PRIVATE"];
   const [selected, setSelected] = useState<string>(selectOption[0]);
-  const socket = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [privateModalIsOpen, setPrivateModalIsOpen] = useState(false);
   const [joinPassword, setJoinPassword] = useState("");
   const [privateChannelName, setPrivateChannelName] = useState<string>("");
   const [channelUsers, setChannelUsers] = useState<ChannelUsers[]>([]);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [inviteData, setInviteData] = useState({} as any);
-  const [inviteeUserName, setInviteeUserName] = useState("");
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
+
+  const router = useRouter();
+
+  const fetchChannelUsers = () => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      )
+      .then((response) => {
+        const channelUsersMap = new Map(
+          response.data.map((user: any) => [user.user_id, user])
+        );
+
+        const fetchUserInfosPromises = response.data.map((userData: any) => {
+          return axios
+            .get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${userData.user_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${access_token}`,
+                },
+              }
+            )
+            .then((userInfoResponse) => {
+              const userInfo = userInfoResponse.data;
+              const isAdmin = (
+                channelUsersMap.get(userData.user_id) as { admin: boolean }
+              ).admin;
+              const isOwner = (
+                channelUsersMap.get(userData.user_id) as { owner: boolean }
+              ).owner;
+              return {
+                ...userInfo,
+                admin: isAdmin,
+                owner: isOwner,
+              };
+            })
+            .catch((error) => {
+              console.error(error);
+              toast.error(
+                (error.response?.data as { message: string })?.message
+              );
+            });
+        });
+        return Promise.all(fetchUserInfosPromises);
+      })
+      .then((users) => {
+        setChannelUsers(users);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const fetchChannels = () => {
     fetchJoinedChannels();
@@ -147,29 +208,39 @@ export default function Channels() {
   };
 
   useEffect(() => {
-    if (socket) {
-      console.log("socket on");
-      socket.on("notification", (message: any) => {
-        console.log(message);
-        toast.success(message.message);
-        if (message.type === "PUBLIC_CHANNEL_CREATED") {
-          fetchChannels();
-        }
-        if (message.type === "INVITE_CUSTOM_GAME") {
-          setInviteData(message);
-          const access_token = Cookies.get("access_token");
+    const handleNotification = (message: any) => {
+      if (message.type === "PUBLIC_CHANNEL_CREATED") {
+        fetchChannels();
+      }
 
+      if (message.type == "KICKED" || message.type == "BANNED") {
+        fetchChannels();
+        setSelectedChannel(0);
+      }
+
+      if (message.type == "GIVEN_ADMIN") {
+        fetchChannelUsers();
+      }
+
+      if (message.type === "SENT_MESSAGE") {
+        if (message.channelId == selectedChannel) {
           axios
             .get(
               `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
               {
                 headers: {
-                  Authorization: `Bearer ${access_token}`,
+                  Authorization: `Bearer ${Cookies.get("access_token")}`,
                 },
               }
             )
-            .then((response) => {
-              setInviteeUserName(response.data.name);
+            .then((userInfoResponse) => {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  chat: message,
+                  sender: userInfoResponse.data,
+                },
+              ]);
             })
             .catch((error) => {
               console.error(error);
@@ -177,46 +248,20 @@ export default function Channels() {
                 (error.response?.data as { message: string })?.message
               );
             });
-          setIsInviteModalOpen(true);
         }
-        if (message.type === "SENT_MESSAGE") {
-          if (message.channelId == selectedChannel) {
-            axios
-              .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/users/id/${message.userId}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${Cookies.get("access_token")}`,
-                  },
-                }
-              )
-              .then((userInfoResponse) => {
-                setMessages((prev) => [
-                  ...prev,
-                  {
-                    chat: message,
-                    sender: userInfoResponse.data,
-                  },
-                ]);
-              })
-              .catch((error) => {
-                console.error(error);
-                toast.error(
-                  (error.response?.data as { message: string })?.message
-                );
-              });
-          }
-        }
-      });
-    }
-
-    return () => {
-      if (socket) {
-        console.log("socket off");
-        socket.off("notification");
       }
     };
-  }, [socket, selectedChannel]);
+
+    registerNotificationEventHandler(handleNotification);
+
+    return () => {
+      unregisterNotificationEventHandler(handleNotification);
+    };
+  }, [
+    selectedChannel,
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  ]);
 
   const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
@@ -318,59 +363,7 @@ export default function Channels() {
         console.error(error);
       });
 
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
-      .then((response) => {
-        const channelUsersMap = new Map(
-          response.data.map((user: any) => [user.user_id, user])
-        );
-
-        const fetchUserInfosPromises = response.data.map((userData: any) => {
-          return axios
-            .get(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${userData.user_id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${access_token}`,
-                },
-              }
-            )
-            .then((userInfoResponse) => {
-              const userInfo = userInfoResponse.data;
-              const isAdmin = (
-                channelUsersMap.get(userData.user_id) as { admin: boolean }
-              ).admin;
-              const isOwner = (
-                channelUsersMap.get(userData.user_id) as { owner: boolean }
-              ).owner;
-              return {
-                ...userInfo,
-                admin: isAdmin,
-                owner: isOwner,
-              };
-            })
-            .catch((error) => {
-              console.error(error);
-              toast.error(
-                (error.response?.data as { message: string })?.message
-              );
-            });
-        });
-        return Promise.all(fetchUserInfosPromises);
-      })
-      .then((users) => {
-        setChannelUsers(users);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    fetchChannelUsers();
   }, [selectedChannel]);
 
   const handleSelectChannel = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -405,6 +398,7 @@ export default function Channels() {
             sender: {
               id: response.data.sent_by_id,
               name: userData.name,
+              status: userData.status,
             },
           },
         ]);
@@ -494,34 +488,8 @@ export default function Channels() {
       });
   };
 
-  const handleAcceptInvite = () => {
-    toast.success(
-      <>
-        초대를 수락했습니다.
-        <br />곧 게임을 시작합니다.
-      </>
-    );
-    // redirect after 3 sconds
-    window.location.href = `/game?roomId=${inviteData.channelId}`;
-  };
-
-  const handleRejectInvite = () => {
-    if (!socket) return;
-    socket.emit("declineInvite", inviteData.channelId);
-    toast.success("초대를 거절했습니다.");
-    setIsInviteModalOpen(false);
-  };
-
   return (
     <div className="chatting">
-      <ToastContainer />
-      <InviteModal
-        isOpen={isInviteModalOpen}
-        onReuqestClose={() => setIsInviteModalOpen(false)}
-        handleAcceptInvite={handleAcceptInvite}
-        handleRejectInvite={handleRejectInvite}
-        inviteeUserName={inviteeUserName}
-      />
       <PasswordModal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
@@ -625,9 +593,14 @@ export default function Channels() {
                 [{user.status}] {user.name}{" "}
                 {user.owner ? "(방장)" : user.admin ? "(관리자)" : ""}
               </a>
-              {userData.id !== user.id && (
+              {userData.id !== user.id && user.status != "in_game" && (
                 <button>
                   <a href={`/game?userId=${user.id}`}>게임 초대</a>
+                </button>
+              )}
+              {userData.id !== user.id && user.status == "in_game" && (
+                <button>
+                  <a href={`/game?spectateUserId=${user.id}`}>게임 관전</a>
                 </button>
               )}
             </li>

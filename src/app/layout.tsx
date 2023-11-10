@@ -2,15 +2,19 @@
 
 import "./globals.css";
 import { Inter } from "next/font/google";
-import LeftSide from "../components/server/LeftSide";
-import RightSide from "../components/server/RightSide";
-import TopNavigator from "../components/server/TopNavigator";
-import { SocketProvider } from "../contexts/SocketContext";
+import LeftSide from "@/components/server/LeftSide";
+import RightSide from "@/components/server/RightSide";
+import TopNavigator from "@/components/server/TopNavigator";
+import { SocketProvider, SocketContext } from "@/contexts/SocketContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import Cookies from "js-cookie";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { parseJWT } from "../utils/jwt";
+import { parseJWT } from "@/utils/jwt";
 import { redirect, usePathname } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import InviteModal from "@/components/InviteModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -91,14 +95,18 @@ export default function RootLayout({
       {accessToken.raw ? (
         <body className={inter.className}>
         
-        <SocketProvider>
-          <TopNavigator />
+        <NotificationProvider>
+            <SocketProvider>
+              <ToastContainer />
+              <InviteModal />
+              <TopNavigator />
           <div className="main">
             <LeftSide />
             <div className="center">{children}</div>
             <RightSide />
           </div>
-        </SocketProvider>
+          </SocketProvider>
+          </NotificationProvider>
         </body> ) : (
                   <body
                     style={{

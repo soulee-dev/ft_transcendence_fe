@@ -1,8 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, useEffect, FormEvent } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -48,6 +47,7 @@ export default function EditProfile() {
       })
       .catch((error: AxiosError) => {
         console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -87,12 +87,12 @@ export default function EditProfile() {
       })
       .catch((error: AxiosError) => {
         console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
   return (
     <div className="myPage">
-      <ToastContainer />
       <h2>마이페이지</h2>
       <img
         src={userData.profile_image}

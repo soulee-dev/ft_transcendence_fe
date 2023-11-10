@@ -1,17 +1,19 @@
 "use client";
 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useState, useEffect, useContext, FC } from "react";
+import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { SocketContext } from "../../contexts/SocketContext";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function Friends() {
   const [friends, setFriends] = useState<User[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [name, setName] = useState<string>("");
-  const socket = useContext(SocketContext);
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
 
   type User = {
     id: number;
@@ -102,31 +104,25 @@ export default function Friends() {
   };
 
   useEffect(() => {
-    if (socket) {
-      console.log("socket on");
-      socket.on("notification", (message: any) => {
-        console.log(message);
-        toast.success(message.message);
-        if (
-          message.type == "REQUESTED_FRIEND" ||
-          message.type == "DELETED_FRIEND" ||
-          message.type == "ACCEPTED_YOUR_REQ" ||
-          message.type == "DECLINED_YOUR_REQ" ||
-          message.type == "ADDED_TO_CHANNEL"
-        ) {
-          fetchFriends();
-          fetchFriendRequests();
-        }
-      });
-    }
-
-    return () => {
-      if (socket) {
-        console.log("socket off");
-        socket.off("notification");
+    const handleNotification = (message: any) => {
+      if (
+        message.type == "REQUESTED_FRIEND" ||
+        message.type == "DELETED_FRIEND" ||
+        message.type == "ACCEPTED_YOUR_REQ" ||
+        message.type == "DECLINED_YOUR_REQ" ||
+        message.type == "ADDED_TO_CHANNEL"
+      ) {
+        fetchFriends();
+        fetchFriendRequests();
       }
     };
-  }, [socket]);
+
+    registerNotificationEventHandler(handleNotification);
+
+    return () => {
+      unregisterNotificationEventHandler(handleNotification);
+    };
+  }, [registerNotificationEventHandler, unregisterNotificationEventHandler]);
 
   const handleFriendRequest = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -251,7 +247,6 @@ export default function Friends() {
 
   return (
     <div className="friend-menu-container">
-      <ToastContainer />
       <h2>친구 목록</h2>
       <ul>
         {friends &&
@@ -267,6 +262,16 @@ export default function Friends() {
               <button onClick={() => handleFriendDelete(friend.name)}>
                 친구 삭제
               </button>
+              {friend.status != "in_game" && (
+                <button>
+                  <a href={`/game?userId=${friend.id}`}>게임 초대</a>
+                </button>
+              )}
+              {friend.status == "in_game" && (
+                <button>
+                  <a href={`/game?spectateUserId=${friend.id}`}>게임 관전</a>
+                </button>
+              )}
             </li>
           ))}
       </ul>

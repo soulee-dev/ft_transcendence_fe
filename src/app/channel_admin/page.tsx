@@ -1,11 +1,11 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useEffect } from "react";
+import { useNotification } from "@/contexts/NotificationContext";
 
 export default function ChannelAdmin() {
   const [adminChannels, setAdminChannels] = useState<any>([]);
@@ -16,6 +16,27 @@ export default function ChannelAdmin() {
   const [mutedUsers, setMutedUsers] = useState<any>([]);
   const [banList, setBanList] = useState<any>([]);
   const [hasPassword, setHasPassword] = useState(false);
+
+  const {
+    registerNotificationEventHandler,
+    unregisterNotificationEventHandler,
+  } = useNotification();
+
+  useEffect(() => {
+    const handleNotification = (message: any) => {
+      if (message.type == "USER_JOIN_CHANNEL") {
+        if (selectedChannel == message.channelId) {
+          fetchChannelUsers(selectedChannel);
+        }
+      }
+    };
+
+    registerNotificationEventHandler(handleNotification);
+
+    return () => {
+      unregisterNotificationEventHandler(handleNotification);
+    };
+  }, [registerNotificationEventHandler, unregisterNotificationEventHandler]);
 
   useEffect(() => {
     fetchChnnelInfo();
@@ -41,14 +62,11 @@ export default function ChannelAdmin() {
   const fetchChannelUsers = (channelId: number) => {
     const access_token = Cookies.get("access_token");
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/channels/${selectedChannel}/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/channels/${channelId}/users`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
       .then((response) => {
         const fetchUserInfosPromises = response.data.map((userData: any) => {
           return axios
@@ -179,7 +197,6 @@ export default function ChannelAdmin() {
 
   return (
     <div className="chatting-management">
-      <ToastContainer />
       <h1>채팅방 관리ㅋㅋ</h1>
       <ul>
         {adminChannels.map((channel: any) => (
@@ -247,13 +264,24 @@ export default function ChannelAdmin() {
                   >
                     MUTE
                   </button>
-                  <button
-                    onClick={() =>
-                      handleAdminUser(user.userData.id, "GIVEADMIN")
-                    }
-                  >
-                    GIVEADMIN
-                  </button>
+                  {!user.channelData.admin && (
+                    <button
+                      onClick={() =>
+                        handleAdminUser(user.userData.id, "GIVEADMIN")
+                      }
+                    >
+                      GIVEADMIN
+                    </button>
+                  )}
+                  {user.channelData.admin && (
+                    <button
+                      onClick={() =>
+                        handleAdminUser(user.userData.id, "REMOVEADMIN")
+                      }
+                    >
+                      REMOVEADMIN
+                    </button>
+                  )}
                 </>
               )}
             </li>

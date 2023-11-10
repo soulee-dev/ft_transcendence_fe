@@ -1,7 +1,6 @@
 "use client";
 
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios, { AxiosResponse, AxiosError } from "axios";
 
@@ -51,7 +50,6 @@ export default function TwoFA({ params }: TwoFAProps) {
 
   return (
     <div>
-      <ToastContainer />
       <h1>2FA</h1>
       <h1>userId: {params.id}</h1>
       <form onSubmit={handleSubmit}>
