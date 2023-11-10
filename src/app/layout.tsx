@@ -116,7 +116,7 @@ export default function RootLayout({
             <ToastContainer
                 theme="dark"
               />
-            <div className="center">{children}</div>
+            <div className="gamecenter">{children}</div>
           </SocketProvider>
           </NotificationProvider>
         </body>) : (

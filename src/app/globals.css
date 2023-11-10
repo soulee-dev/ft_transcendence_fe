@@ -111,16 +111,6 @@ body {
   }
 }
 
-body {
-  /* color: rgb(var(--foreground-rgb)); */
-  color: white;
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
 
 .main {
   flex: 1;
@@ -553,9 +543,6 @@ body {
 
 }
 
-canvas {
-  position: absolute;
-}
 
 .loginPage {
   display: flex;
@@ -587,6 +574,15 @@ canvas {
   width: 498px;
   height: 726px;
   overflow-y: scroll;
+}
+
+.gamecenter {
+  flex: 1;
+  border: 1px solid white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 .chatting {
@@ -664,6 +660,9 @@ canvas {
 	width: 500px;
   /* background-color: black; */
 	/* height: 72 7px; */
+}
+
+.gameContainer {
 }
 
 .game{
