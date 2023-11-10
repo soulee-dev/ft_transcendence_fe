@@ -47,6 +47,7 @@ export default function EditProfile() {
       })
       .catch((error: AxiosError) => {
         console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
@@ -86,6 +87,7 @@ export default function EditProfile() {
       })
       .catch((error: AxiosError) => {
         console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
       });
   };
 
