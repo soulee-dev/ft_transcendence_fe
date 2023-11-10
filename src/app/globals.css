@@ -597,7 +597,7 @@ canvas {
   align-items: center;
   justify-content: center;
   /* border: 1px solid white; */
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .makeChattingRoom {
@@ -633,7 +633,7 @@ canvas {
   flex: 1;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   padding-bottom: 10px;
   margin: 10px; /* 모든 방향(상, 하, 좌, 우)에 10px의 간격 설정 */
 }
@@ -724,7 +724,7 @@ canvas {
   flex: 1;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .ranking {
@@ -734,7 +734,7 @@ canvas {
   flex: 1;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .myPage {
@@ -779,7 +779,7 @@ canvas {
   flex: 1;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .friend-menu-container ul, 
@@ -812,5 +812,5 @@ canvas {
   flex: 1;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
