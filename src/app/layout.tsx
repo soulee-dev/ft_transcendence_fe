@@ -113,7 +113,10 @@ export default function RootLayout({
         
         <NotificationProvider>
             <SocketProvider>
-              
+            <ToastContainer
+                theme="dark"
+              />
+            <div className="center">{children}</div>
           </SocketProvider>
           </NotificationProvider>
         </body>) : (
