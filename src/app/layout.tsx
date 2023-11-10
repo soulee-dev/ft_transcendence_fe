@@ -97,7 +97,9 @@ export default function RootLayout({
         
         <NotificationProvider>
             <SocketProvider>
-              <ToastContainer />
+              <ToastContainer
+                theme="dark"
+              />
               <InviteModal />
               <TopNavigator />
           <div className="main">
