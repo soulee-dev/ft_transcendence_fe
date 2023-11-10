@@ -23,6 +23,12 @@ export const SocketContext = createContext<{
   closeInviteModal: () => {},
 });
 
+export const GameStateContext = createContext<{
+  isPlaying : boolean;
+}>({
+  isPlaying : false,
+});
+
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const { dispatchNotificationEvent } = useNotification();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { SocketContext } from "@/contexts/SocketContext";
+import { SocketContext, GameStateContext } from "@/contexts/SocketContext";
 import Player from "@/game/Player";
 import { useSearchParams } from "next/navigation";
 import Ball from "@/game/Ball";
@@ -23,7 +23,7 @@ export default function Game() {
   const [ball, setBall] = useState<Ball | null>(null);
   const [isCustomGameModalOpen, setIsCustomGameModalOpen] = useState(false);
   const [isSpectate, setIsSpectate] = useState(false);
-
+  const gameState = useContext(GameStateContext);
   const canvasRef = useRef(null);
   const params = useSearchParams();
 
@@ -33,6 +33,7 @@ export default function Game() {
   const roomIdParam = params.get("roomId");
   const spectateUserId = params.get("spectateUserId");
 
+  gameState.isPlaying = true;
   useEffect(() => {
     if (!socket) return;
 
