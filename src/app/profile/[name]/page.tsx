@@ -94,10 +94,10 @@ export default function Profile({ params }: ProfileProps) {
         // Map records to promises to fetch user profiles
         const userPromises = records.map((record: any) => {
           return Promise.all([
-            axios.get(`http://localhost:3000/users/id/${record.player1_id}`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player1_id}`, {
               headers: { Authorization: `Bearer ${access_token}` },
             }),
-            axios.get(`http://localhost:3000/users/id/${record.player2_id}`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player2_id}`, {
               headers: { Authorization: `Bearer ${access_token}` },
             }),
           ]).then(([player1Response, player2Response]) => {
