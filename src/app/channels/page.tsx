@@ -375,6 +375,10 @@ export default function Channels() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const access_token = Cookies.get("access_token");
+    if (!messageText) {
+      toast.error("메시지를 입력해주세요.");
+      return;
+    }
     axios
       .post(
         `${process.env.NEXT_PUBLIC_API_URL}/chat/${selectedChannel}`,
@@ -504,46 +508,46 @@ export default function Channels() {
         setJoinPassword={setJoinPassword}
         onSubmit={handlePrivatePasswordSubmit}
       />
-        <h1>채팅방 생성하기</h1>
-        <input
-          name="name"
-          type="text"
-          placeholder="채팅방 이름"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <br />
-        <input
-          name="password"
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <select onChange={handleSelect} value={selected}>
-          {selectOption.map((item) => (
-            <option value={item} key={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-        <br />
-        <input
-          name="userName"
-          type="text"
-          placeholder="추가할 유저 이름"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-        />
-        <button onClick={addUser}>유저 추가하기</button>
-        <ul>
-          {userList.map((user, index) => (
-            <li key={index}>{user}</li>
-          ))}
-        </ul>
-        <button onClick={() => handleCreateChannel()}>채팅방 만들기</button>
-      
+      <h1>채팅방 생성하기</h1>
+      <input
+        name="name"
+        type="text"
+        placeholder="채팅방 이름"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <br />
+      <input
+        name="password"
+        type="password"
+        placeholder="비밀번호"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <br />
+      <select onChange={handleSelect} value={selected}>
+        {selectOption.map((item) => (
+          <option value={item} key={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+      <br />
+      <input
+        name="userName"
+        type="text"
+        placeholder="추가할 유저 이름"
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+      />
+      <button onClick={addUser}>유저 추가하기</button>
+      <ul>
+        {userList.map((user, index) => (
+          <li key={index}>{user}</li>
+        ))}
+      </ul>
+      <button onClick={() => handleCreateChannel()}>채팅방 만들기</button>
+
       <h1>비공개 채팅방 들어가기</h1>
       <form onSubmit={handleJoinPrivateSubmit}>
         <input
