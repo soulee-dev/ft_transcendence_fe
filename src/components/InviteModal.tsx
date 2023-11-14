@@ -54,37 +54,35 @@ const InviteModal = () => {
       ariaHideApp={false}
       onRequestClose={closeInviteModal}
       contentLabel="게임 초대"
-
       style={{
         overlay: {
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0)',
-          height: '770px',
+          backgroundColor: "rgba(0, 0, 0)",
+          height: "770px",
         },
         content: {
-          position: 'absolute',
-          top: '40px',
-          left: '40px',
-          right: '40px',
-          bottom: '40px',
-          border: '1px solid #ccc',
-          overflow: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          borderRadius: '4px',
-          outline: 'none',
-          padding: '20px',
-          backgroundColor: 'rgba(0, 0, 0)',
-        }
+          position: "absolute",
+          top: "40px",
+          left: "40px",
+          right: "40px",
+          bottom: "40px",
+          border: "1px solid #ccc",
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
+          borderRadius: "4px",
+          outline: "none",
+          padding: "20px",
+          backgroundColor: "rgba(0, 0, 0)",
+        },
       }}
     >
       <h2>{inviteeUserName}의 게임 초대가 왔습니다!</h2>
       <button onClick={handleAcceptInvite}>수락</button>
       <button onClick={handleRejectInvite}>거절</button>
-      <button onClick={handleClose}>닫기</button>
     </Modal>
   );
 };
