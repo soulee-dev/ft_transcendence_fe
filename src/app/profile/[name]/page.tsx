@@ -94,12 +94,18 @@ export default function Profile({ params }: ProfileProps) {
         // Map records to promises to fetch user profiles
         const userPromises = records.map((record: any) => {
           return Promise.all([
-            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player1_id}`, {
-              headers: { Authorization: `Bearer ${access_token}` },
-            }),
-            axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player2_id}`, {
-              headers: { Authorization: `Bearer ${access_token}` },
-            }),
+            axios.get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player1_id}`,
+              {
+                headers: { Authorization: `Bearer ${access_token}` },
+              }
+            ),
+            axios.get(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/id/${record.player2_id}`,
+              {
+                headers: { Authorization: `Bearer ${access_token}` },
+              }
+            ),
           ]).then(([player1Response, player2Response]) => {
             return {
               ...record,
@@ -148,6 +154,25 @@ export default function Profile({ params }: ProfileProps) {
       });
   };
 
+  const handleBlockUser = (name: string) => {
+    const access_token = Cookies.get("access_token");
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_API_URL}/blocked/add?name=${name}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+        }
+      )
+      .then((response: AxiosResponse) => {
+        toast.success("차단되었습니다.");
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error((error.response?.data as { message: string })?.message);
+      });
+  };
+
   return (
     <div>
       <h1>Profile</h1>
@@ -189,6 +214,7 @@ export default function Profile({ params }: ProfileProps) {
           <button onClick={() => handleAddFriend(profile.name)}>
             친구 추가
           </button>
+          <button onClick={() => handleBlockUser(profile.name)}>차단</button>
         </div>
       )}
     </div>
