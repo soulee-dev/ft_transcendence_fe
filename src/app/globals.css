@@ -567,10 +567,10 @@ body {
   
   flex: 1;
   border: 1px solid white;
-  flex-direction: column;
+  /* flex-direction: column;
   justify-content: center;
   align-items: center;
-  display: flex;
+  display: flex; */
   width: 498px;
   height: 726px;
   overflow-y: scroll;
