@@ -38,3 +38,6 @@ out
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+
+# next auto-generated file
+next-env.d.ts
